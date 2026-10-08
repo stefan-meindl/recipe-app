@@ -1,0 +1,15 @@
+{
+    "id": "pancakes",
+    "title": "Pancakes",
+    "ingredients": [
+        { "name": "Flour", "quantity": "200 g" },
+        { "name": "Milk", "quantity": "300 ml" },
+        { "name": "Eggs", "quantity": "2" },
+        { "name": "Butter", "quantity": "20 g" }
+    ],
+    "steps": [
+        "Whisk the flour, milk and eggs into a smooth batter.",
+        "Melt the butter in a pan over medium heat.",
+        "Pour in a ladle of batter and cook until golden, about 2 minutes per side."
+    ]
+}

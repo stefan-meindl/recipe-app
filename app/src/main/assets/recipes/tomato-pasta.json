@@ -1,0 +1,15 @@
+{
+    "id": "tomato-pasta",
+    "title": "Tomato Pasta",
+    "ingredients": [
+        { "name": "Spaghetti", "quantity": "250 g" },
+        { "name": "Canned tomatoes", "quantity": "400 g" },
+        { "name": "Garlic", "quantity": "2 cloves" },
+        { "name": "Olive oil", "quantity": "2 tbsp" }
+    ],
+    "steps": [
+        "Boil the spaghetti in salted water until al dente.",
+        "Fry the garlic in olive oil, add the tomatoes and simmer for 10 minutes.",
+        "Toss the drained pasta in the sauce and serve."
+    ]
+}
