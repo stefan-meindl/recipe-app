@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -29,6 +30,12 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
+
+    implementation(libs.kotlinx.serialization.json)
+
+    // Image loading
+    implementation(libs.coil3.compose)
+    implementation(libs.coil3.network)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
