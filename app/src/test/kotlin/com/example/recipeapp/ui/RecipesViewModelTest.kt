@@ -2,7 +2,9 @@ package com.example.recipeapp.ui
 
 import com.example.recipeapp.data.RecipeRepository
 import com.example.recipeapp.model.Ingredient
+import com.example.recipeapp.model.PreparationMethod
 import com.example.recipeapp.model.Recipe
+import com.example.recipeapp.model.Step
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -21,8 +23,18 @@ class RecipesViewModelTest {
     private val toast = Recipe(
         id = "toast",
         title = "Toast",
-        ingredients = listOf(Ingredient("Bread", "2 slices")),
-        steps = listOf("Toast the bread."),
+        preparationMethods = listOf(
+            PreparationMethod(
+                id = "basic",
+                displayName = "Basic",
+                ingredients = listOf(
+                    Ingredient("Bread", "2 slices"),
+                ),
+                steps = listOf(
+                    Step("Toast the bread."),
+                ),
+            ),
+        ),
     )
 
     private class FakeRepository(private val recipes: List<Recipe>) : RecipeRepository {

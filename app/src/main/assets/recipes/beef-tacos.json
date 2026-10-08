@@ -1,0 +1,98 @@
+{
+    "id": "beef-tacos",
+    "title": "Beef Tacos",
+    "prepTimeMinutes": 15,
+    "cookTimeMinutes": 20,
+    "servings": 4,
+    "tags": ["dinner", "mexican", "spicy"],
+    "images": [
+        "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=800"
+    ],
+    "notes": "Warm tortillas on a dry skillet for 30 seconds each side. Top with fresh cilantro and diced onion.",
+    "preparationMethods": [
+        {
+            "id": "skillet",
+            "displayName": "Skillet",
+            "ingredients": [
+                {
+                    "name": "Ground beef",
+                    "quantity": "500 g",
+                    "tips": ["80/20 fat ratio gives the best flavour"]
+                },
+                {
+                    "name": "Taco seasoning",
+                    "quantity": "2 packets",
+                    "alternatives": ["homemade: 1 tbsp chili powder, 1 tsp cumin, 1 tsp paprika, ½ tsp garlic powder"]
+                },
+                {
+                    "name": "Corn tortillas",
+                    "quantity": "12",
+                    "alternatives": ["flour tortillas"]
+                },
+                {
+                    "name": "Cheddar cheese",
+                    "quantity": "150 g",
+                    "alternatives": ["Monterey Jack", "queso fresco"]
+                },
+                {
+                    "name": "Salsa",
+                    "quantity": "1 cup"
+                },
+                {
+                    "name": "Sour cream",
+                    "quantity": "½ cup",
+                    "alternatives": ["Greek yogurt"]
+                },
+                {
+                    "name": "Avocado",
+                    "quantity": "2",
+                    "tips": ["Should yield slightly to gentle pressure"]
+                },
+                {
+                    "name": "Lime",
+                    "quantity": "2"
+                },
+                {
+                    "name": "Fresh cilantro",
+                    "quantity": "½ bunch"
+                },
+                {
+                    "name": "Salt",
+                    "quantity": "to taste"
+                }
+            ],
+            "steps": [
+                {
+                    "description": "Heat a large skillet over medium-high heat. No oil needed — the beef fat will render.",
+                    "durationMinutes": 2
+                },
+                {
+                    "description": "Add ground beef, breaking it into small crumbles with a wooden spoon.",
+                    "durationMinutes": 3,
+                    "tips": ["Don't press the meat flat — keeping it loose gives better browning"]
+                },
+                {
+                    "description": "Season with taco seasoning and ½ tsp salt. Stir to coat evenly.",
+                    "durationMinutes": 1
+                },
+                {
+                    "description": "Reduce heat to medium and cook, stirring occasionally, until beef is browned and no pink remains.",
+                    "durationMinutes": 8,
+                    "tips": ["If excess grease pools, drain it with a slotted spoon"]
+                },
+                {
+                    "description": "While beef cooks, warm tortillas in a dry skillet over medium heat, 30 seconds per side.",
+                    "durationMinutes": 3
+                },
+                {
+                    "description": "Slice avocados and limes. Chop cilantro.",
+                    "durationMinutes": 3
+                },
+                {
+                    "description": "Assemble tacos: beef, cheese, salsa, sour cream, avocado slices, a squeeze of lime, and cilantro.",
+                    "durationMinutes": 2
+                }
+            ]
+        }
+    ]
+}
