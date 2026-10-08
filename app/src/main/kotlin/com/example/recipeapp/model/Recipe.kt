@@ -71,3 +71,22 @@ data class Step(
     val durationMinutes: Int? = null,
     val tips: List<String>? = null,
 )
+
+/**
+ * Scale a quantity string by a multiplier.
+ * Handles formats like "200 g", "1.5 cups", "2", etc.
+ */
+fun scaleQuantity(quantity: String, multiplier: Double): String {
+    val trimmed = quantity.trim()
+    val match = Regex("""^([\d.]+)\s*(.*)$""").find(trimmed)
+    return if (match != null) {
+        val number = match.groupValues[1].toDoubleOrNull() ?: 1.0
+        val unit = match.groupValues[2].trim()
+        val scaled = (number * multiplier).let {
+            if (it == it.toLong().toDouble()) it.toLong().toString() else String.format("%.2g", it)
+        }
+        if (unit.isNotEmpty()) "$scaled $unit" else scaled
+    } else {
+        quantity // return unchanged if no numeric part found
+    }
+}

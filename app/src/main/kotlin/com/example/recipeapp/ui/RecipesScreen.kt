@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import com.example.recipeapp.model.Recipe
 
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -21,10 +22,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
-import androidx.compose.material.icons.filled.Cooking
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Notes
+import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -98,7 +99,7 @@ private fun RecipeList(recipes: List<Recipe>, onSelect: (String) -> Unit, modifi
                 supportingContent = {
                     Column {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Cooking, null, modifier = Modifier.padding(end = 4.dp))
+                            Icon(Icons.Default.Restaurant, null, modifier = Modifier.padding(end = 4.dp))
                             Text(totalTime ?: "${recipe.preparationMethods.size} methods")
                         }
                         if (recipe.tags.isNotEmpty()) {
@@ -108,7 +109,7 @@ private fun RecipeList(recipes: List<Recipe>, onSelect: (String) -> Unit, modifi
                                 color = MaterialTheme.colorScheme.secondary,
                             )
                         }
-                    },
+                    }
                 },
                 modifier = Modifier.clickable { onSelect(recipe.id) },
             )
@@ -154,7 +155,7 @@ private fun RecipeDetail(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.Event, null, modifier = Modifier.padding(end = 4.dp))
                     val totalTime = state.totalTimeMinutes
-                    Text(totalTime?.let { "${it} min total" ?: "No time info" })
+                    Text(totalTime?.let { "${it} min total" } ?: "No time info")
                 }
                 if (selected.tags.isNotEmpty()) {
                     Row(modifier = Modifier.padding(top = 4.dp)) {

@@ -35,7 +35,8 @@ dependencies {
 
     // Image loading
     implementation(libs.coil3.compose)
-    implementation(libs.coil3.network)
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.4")
+    implementation("androidx.compose.material:material-icons-extended")
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
