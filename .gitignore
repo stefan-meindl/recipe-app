@@ -1,0 +1,18 @@
+# Built artifacts
+*.apk
+*.ap_
+*.aab
+build/
+app/build/
+
+# Gradle
+.gradle/
+gradle/wrapper/gradle-wrapper.jar
+
+# Android
+*.iml
+.idea/
+local.properties
+
+# OS
+.DS_Store
