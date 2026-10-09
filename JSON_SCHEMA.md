@@ -176,7 +176,7 @@ The "Current JS" column is derived by reading `cond()` (lines 226-233), not by r
 | `"!add:bear"` | error: no such `add` variation | holds, silently |
 | `"add:mince"` | error: `mince` is a swap, not an add | does not hold, silently |
 | `[]` | error: empty array | holds (`every` on an empty array is true) |
-| `["rice=pot", ""]` | error: element 2 is empty | result follows element 1: `every` short-circuits on the first false element, so this equals element 1's result (`"rice=pot"` holds) |
+| `["rice=pot", ""]` | error: element 2 is empty | holds (element 1 `"rice=pot"` holds and element 2 `""` holds — an empty condition is "no condition" — so `every` evaluates **both** elements and returns true by AND; it does **not** short-circuit) |
 | `["rice=pot", 5]` | error: element 2 is not a string | throws a TypeError (`5.startsWith`) only if element 1 holds; otherwise `every` stops early and the result is "does not hold" |
 | `5` | error: not a string or array | throws a TypeError |
 | `null`, `0`, `false` | `null` is allowed only as "absent"; `0` and `false` are errors | all hold (falsy) |
