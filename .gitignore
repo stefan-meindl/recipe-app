@@ -37,3 +37,6 @@ Design/
 
 # StarNet workshop scratch
 workshop/
+
+# Keep run configurations in version control
+!.idea/runConfigurations/

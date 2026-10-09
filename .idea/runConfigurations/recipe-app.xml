@@ -1,0 +1,15 @@
+<component name="RunManager">
+  <element type="AndroidRunPluginConfiguration">
+    <option name="NAME" value="recipe-app" />
+    <option name="PACKAGE_NAME" value="com.example.recipeapp" />
+    <option name="MAIN_CLASS" value="com.example.recipeapp.MainActivity" />
+    <option name="MODULE" value="recipe-app.app" />
+    <option name="GRADLE_PROJECT_NAME" value=":app" />
+    <option name="METHOD" value="" />
+    <option name="LAUNCH_APP" value="true" />
+    <option name="INSTALL_MODE" value="DEFAULT" />
+    <option name="EMULATED" value="false" />
+    <option name="DEVICE_NAME" value="Medium_Phone_API_37.0" />
+    <option name="DEVICE_TYPE" value="ANDROID_DEVICE" />
+  </element>
+</component>
