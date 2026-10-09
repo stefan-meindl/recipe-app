@@ -185,3 +185,68 @@ but the build line.
 Handoff to BUILD LINE (engineering label): PR #30 is MERGEABLE / CLEAN with 4 commits.
 Phone-test the APK against the worked example in section 10 (S1–S4) and the section 7.1
 invalid-condition contract; re-run the three verify scripts on a clean checkout if needed.
+
+## STAGE-5 VERIFICATION (independent re-check against the live source)
+
+Re-ran every check from scratch on this pass — shell was available, so this is execution,
+not hand-tracing.
+
+### Checks I actually ran (real output)
+
+**Repo state**
+- Branch `docs/issue-5-v2-schema`, HEAD = `1a99690`. `git log --oneline -6`:
+  `1a99690` → `09483e3` → `1173254` → `1ffdac9` → `dbc0b11` → `e377b8e` (merge origin/main).
+- `git check-ignore -v Design` → exit 1 (tracked). `git ls-files Design` → **28 files**.
+- `git rev-list --left-right --count origin/main...HEAD` = `0	5` — 5 commits ahead, 0 behind.
+
+**PR #30** (`gh pr view 30`)
+- `state: OPEN`, `mergeable: MERGEABLE`, 5 commits (dbc0b11, 1ffdac9, 1173254, 09483e3, 1a99690).
+- URL https://github.com/stefan-meindl/recipe-app/pull/30.
+
+**Script 1 — `node scripts/verify-issue5-schema.js`**
+```
+OK: JSON_SCHEMA.md matches the real SIMMER source (cond, fmtQty, resolve).
+```
+Exit 0. Reads `Design/Recipe app with cooking steps/simmer-data.js` as the source of truth. **PASS.**
+
+**Script 2 — `node scripts/verify-issue5-edge.js`**
+```
+OK: edge cases pass (fmtQty boundaries, cond short-circuit, resolve rendering/error contract).
+```
+Exit 0. **PASS.**
+
+**Script 3 — `node scripts/verify-reviewer-ricepot.js`**
+```
+cond("")            = true
+cond("rice=pot")    = true
+cond(["rice=pot",""]) = true
+element1 holds?     = true
+element2 holds?     = true
+evaluated BOTH?     = true
+result "holds"?     = true
+```
+Exit 0. **PASS.**
+
+### Nit fix confirmed in the doc
+Line 179 of `JSON_SCHEMA.md` (repo root) now reads:
+> `["rice=pot", ""]` → ... holds (element 1 `"rice=pot"` holds and element 2 `""` holds — an empty condition is "no condition" — so `every` evaluates **both** elements and returns true by AND; it does **not** short-circuit)
+
+The output ("holds") is unchanged; only the explanation was corrected, exactly as the reviewer reported.
+
+### Files this pass
+- No new files written to the plan — the plan already carries TESTER notes and REVIEWER notes.
+- This stage's contribution is the independent re-run above, which reproduces every prior result.
+
+### Verification
+- All three scripts exit 0 on the live source.
+- PR #30 OPEN / MERGEABLE, branch 5 ahead / 0 behind origin/main.
+- `Design/` tracked (28 files), matches the doc.
+- The wording nit is corrected and re-verified by script 3.
+
+VERDICT: approved. Every check the engineer, tester, and reviewer ran reproduces cleanly on
+this pass against the real `simmer-data.js`; the one wording nit is fixed and re-proofed.
+Nothing left but the build line.
+
+Handoff to BUILD LINE: PR #30 is MERGEABLE / CLEAN, 5 commits. Phone-test the APK against the
+worked example in section 10 (S1–S4) and the section 7.1 invalid-condition contract; re-run
+the three verify scripts on a clean checkout if needed.
