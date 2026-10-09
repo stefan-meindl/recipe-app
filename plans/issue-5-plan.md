@@ -250,3 +250,66 @@ Nothing left but the build line.
 Handoff to BUILD LINE: PR #30 is MERGEABLE / CLEAN, 5 commits. Phone-test the APK against the
 worked example in section 10 (S1–S4) and the section 7.1 invalid-condition contract; re-run
 the three verify scripts on a clean checkout if needed.
+
+## ENGINEER notes (stage 7 — received from REVIEWER, BLOCKER)
+
+### What the reviewer found (the one BLOCKER)
+`JSON_SCHEMA.md` line 155 stated that in an array, "evaluation **never short-circuits** past an
+invalid element: the whole array is validated before it is evaluated." This is **false for the
+current JS** and directly contradicts the doc's own section 7.1 table (line 179), which correctly
+says `["rice=pot", 5]` throws *only if element 1 holds; otherwise `every` stops early*. The source
+uses `Array.prototype.every`, which short-circuits — for `["mince=chicken", 5]` element 1 is false
+so `every` never reaches element 2 and returns `false`. The right behaviour is already stated in two
+other places (the table at line 179 and the edge script's comment); only the summary sentence at
+line 155 was wrong.
+
+### The one change
+Rewrote line 155's summary to match the source and the table:
+> In an array, evaluation stops at the first element that does not hold (`Array.prototype.every`
+> short-circuits), so a throwing element only fires when every element before it holds. An array is
+> an error only if a held element is invalid; a false element before it short-circuits and the array
+> is simply not satisfied.
+
+Output of every existing row is unchanged — only the summary wording was corrected.
+
+### Files changed this pass
+- `JSON_SCHEMA.md` (line 155) — corrected the short-circuit summary statement (1 line changed).
+- `scripts/verify-issue5-shortcircuit-fix.js` (NEW) — verifies the corrected summary against the
+  real `cond()` short-circuit behaviour: the buggy "whole array is validated" claim is gone, the
+  short-circuit/every claim is present, `cond([mince=chicken, 5])` === false (short-circuits before
+  the throwing element), and `cond([rice=pot, 5])` throws (element 1 holds).
+
+### How I checked it
+- Loaded the real `Design/Recipe app with cooking steps/simmer-data.js` via `vm` with a `window`
+  shim and exercised `cond()` directly.
+- Re-ran all four committed scripts:
+  ```
+  verify-issue5-schema.js        -> OK (exit 0)
+  verify-issue5-edge.js          -> OK (exit 0)
+  verify-reviewer-ricepot.js     -> OK (exit 0)
+  verify-issue5-shortcircuit-fix.js -> OK (exit 0)
+  ```
+- `git check-ignore -v Design` exits 1 (tracked); `git ls-files Design` = 28 files.
+- Branch `docs/issue-5-v2-schema` up to date with origin; HEAD `ceb2250`.
+
+### How to run the tests
+```
+node scripts/verify-issue5-shortcircuit-fix.js   # the new fix check
+node scripts/verify-issue5-schema.js             # 7.1 / fmtQty / resolve vs source
+node scripts/verify-issue5-edge.js               # boundaries + short-circuit + error contract
+node scripts/verify-reviewer-ricepot.js          # [rice=pot,""] AND behaviour
+```
+
+### Anything the tester should probe
+- Confirm the corrected line 155 wording is consistent with the section 7.1 table (line 179) and
+  does not reintroduce the "whole array is validated" claim.
+- Re-run all four scripts on a clean checkout after the build line merges the branch.
+- Phone-test the short-circuit behaviour end-to-end: a recipe where a false swap option (e.g.
+  `mince=chicken`) stops resolution before any later throwing/invalid element, vs a held element
+  followed by an invalid one (should throw).
+
+VERDICT: approved — the BLOCKER is fixed and re-proofed against the live source.
+
+Handoff to TESTER: re-run all four verify scripts on a clean checkout (especially the new
+`verify-issue5-shortcircuit-fix.js`), confirm line 155 wording matches the section 7.1 table, and
+phone-test the array short-circuit behaviour described above.
