@@ -113,3 +113,75 @@ Handoff to REVIEWER: the `["rice=pot", ""]` explanation wording (output is corre
 short-circuit rationale is not). Everything else — 22 cond rows, 9 fmtQty cases, S1–S4,
 the extra example, `Design/` tracking, PR #30 open/mergeable — is verified against the
 real source.
+
+## REVIEWER notes
+
+Ran the tester's claims against the **live source** on this pass (shell available). The
+tester's one outstanding nit — the imprecise short-circuit wording for the
+`["rice=pot", ""]` row in section 7.1 — is the only thing left before the doc ships.
+
+### What I checked (independently, against the live source)
+
+Wrote and ran `scripts/verify-reviewer-ricepot.js` (loads the real `simmer-data.js` via
+`vm.createContext({window:{}})` + `vm.runInContext`, since the source assigns to `window`):
+
+```
+cond("")            = true
+cond("rice=pot")    = true
+cond(["rice=pot",""]) = true
+element1 holds?     = true
+element2 holds?     = true
+evaluated BOTH?     = true
+result "holds"?     = true
+```
+
+Both elements are `true`, so `every()` evaluates **both** and returns true by AND. The
+doc's "Current JS" column said `every` "short-circuits on the first false element" — but
+element 1 (`rice=pot`) is **true**, not false. The *output* ("holds") was already correct
+and execution-proofed by both prior scripts; only the *explanation* was wrong.
+
+### The one change
+
+Rewrote the section 7.1 row `["rice=pot", ""]` "Current JS" cell to state the correct
+mechanism: element 1 holds and element 2 holds (an empty condition is "no condition"), so
+`every` evaluates **both** and returns true by AND — it does **not** short-circuit. Output
+unchanged (still "holds"); only the reasoning is corrected.
+
+### Files changed
+- `JSON_SCHEMA.md` — section 7.1 row `["rice=pot", ""]` wording (wording-only; no executed
+  value changed).
+- `scripts/verify-reviewer-ricepot.js` (NEW) — independent check that both elements hold
+  and `every` evaluates both. Re-run with: `node scripts/verify-reviewer-ricepot.js`.
+- Committed to branch `docs/issue-5-v2-schema` (commit `09483e3`), pushed to origin.
+
+### How to run the checks
+```
+cd /home/stefan/projects/recipe-app
+node scripts/verify-issue5-schema.js   # -> "OK: JSON_SCHEMA.md matches the real SIMMER source..."
+node scripts/verify-issue5-edge.js     # -> "OK: edge cases pass..."
+node scripts/verify-reviewer-ricepot.js # -> evaluates BOTH? = true, result "holds"? = true
+```
+Requires node >= 18. No dependencies.
+
+### Verification
+- Re-ran both prior scripts after the wording change: both still **PASS** (exit 0). The
+  fix is wording-only, so it cannot affect the execution-proofed rows.
+- `git check-ignore -v Design` exits 1; `git ls-files Design` = 28 files. `Design/` tracked.
+- Branch up to date with origin; `git log --oneline -1 origin/docs/issue-5-v2-schema` =
+  `09483e3` (this commit).
+- `gh pr view 30` → **OPEN / MERGEABLE / CLEAN**, 4 commits. URL
+  https://github.com/stefan-meindl/recipe-app/pull/30.
+
+### Open points (by design, left for the build line / next stage)
+- Section 7.1's `sel` assumption is stated now but the two remaining Open-points items
+  (UI use of `ing`, icon-name set) are unverified — design bundle not read.
+- PR #30 is OPEN and not merged. Per the repo's own workflow, adding the `engineering`
+  label triggers the build line.
+
+VERDICT: approved. The doc's "executed" claim is backed by three committed scripts that
+pass on the real source; the one wording nit is corrected and re-verified. Nothing left
+but the build line.
+
+Handoff to BUILD LINE (engineering label): PR #30 is MERGEABLE / CLEAN with 4 commits.
+Phone-test the APK against the worked example in section 10 (S1–S4) and the section 7.1
+invalid-condition contract; re-run the three verify scripts on a clean checkout if needed.
