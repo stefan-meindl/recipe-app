@@ -1,0 +1,55 @@
+{
+    "id": "tomato-pasta",
+    "title": "Tomato Pasta",
+    "prepTimeMinutes": 5,
+    "cookTimeMinutes": 20,
+    "servings": 2,
+    "tags": ["dinner", "vegetarian", "italian"],
+    "images": ["https://images.unsplash.com/photo-1622973536968-3ead9e780960?w=800"],
+    "notes": "Add a pinch of sugar to balance acidity of tomatoes.",
+    "preparationMethods": [
+        {
+            "id": "pot",
+            "displayName": "Stovetop Pot",
+            "ingredients": [
+                { "name": "Spaghetti", "quantity": "250 g", "alternatives": ["penne", "fusilli"] },
+                { "name": "Canned tomatoes", "quantity": "400 g", "alternatives": ["fresh tomatoes (600g, diced)"] },
+                { "name": "Garlic", "quantity": "2 cloves", "alternatives": ["1 tsp garlic powder"] },
+                { "name": "Olive oil", "quantity": "2 tbsp" },
+                { "name": "Salt", "quantity": "to taste" },
+                { "name": "Black pepper", "quantity": "to taste" },
+                { "name": "Fresh basil", "quantity": "handful", "alternatives": ["1 tsp dried basil"] }
+            ],
+            "steps": [
+                { "description": "Bring a large pot of salted water to boil. Water should taste like the sea.", "durationMinutes": 5, "tips": ["Use 1 tbsp salt per liter of water"] },
+                { "description": "Add spaghetti and cook until al dente according to package directions.", "durationMinutes": 8, "tips": ["Reserve ½ cup pasta water before draining"] },
+                { "description": "While pasta cooks, crush tomatoes by hand or blend briefly.", "durationMinutes": 2 },
+                { "description": "Heat olive oil in a pan. Add crushed garlic and cook until fragrant, 30 seconds.", "durationMinutes": 1 },
+                { "description": "Add crushed tomatoes, salt, and pepper. Simmer for 10 minutes.", "durationMinutes": 10, "tips": ["Stir occasionally to prevent sticking"] },
+                { "description": "Drain pasta, reserving water. Add pasta to sauce with a splash of pasta water.", "durationMinutes": 1 },
+                { "description": "Toss over low heat until sauce clings to pasta. Top with basil.", "durationMinutes": 1 }
+            ]
+        },
+        {
+            "id": "pressure-cooker",
+            "displayName": "Pressure Cooker (Instant Pot)",
+            "ingredients": [
+                { "name": "Spaghetti", "quantity": "250 g", "alternatives": ["penne", "fusilli"], "tips": ["Break spaghetti in half to fit"] },
+                { "name": "Canned tomatoes", "quantity": "400 g" },
+                { "name": "Garlic", "quantity": "2 cloves" },
+                { "name": "Olive oil", "quantity": "2 tbsp" },
+                { "name": "Water", "quantity": "2 cups" },
+                { "name": "Salt", "quantity": "1 tsp" },
+                { "name": "Fresh basil", "quantity": "handful" }
+            ],
+            "steps": [
+                { "description": "Add water, olive oil, and salt to pressure cooker.", "durationMinutes": 1 },
+                { "description": "Add broken spaghetti on top (don't stir). Pour crushed tomatoes over pasta.", "durationMinutes": 2 },
+                { "description": "Seal lid, set to high pressure for 7 minutes.", "durationMinutes": 1, "tips": ["Do not stir — pasta cooks in the water below"] },
+                { "description": "Quick release pressure when timer beeps.", "durationMinutes": 2 },
+                { "description": "Stir well — sauce should coat pasta. If too thick, add water ¼ cup at a time.", "durationMinutes": 1 },
+                { "description": "Top with fresh basil and serve.", "durationMinutes": 1 }
+            ]
+        }
+    ]
+}

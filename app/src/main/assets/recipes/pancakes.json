@@ -1,0 +1,50 @@
+{
+    "id": "pancakes",
+    "title": "Pancakes",
+    "prepTimeMinutes": 10,
+    "cookTimeMinutes": 15,
+    "servings": 4,
+    "tags": ["breakfast", "vegetarian"],
+    "images": ["https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=800"],
+    "notes": "Best served with maple syrup or fresh berries.",
+    "preparationMethods": [
+        {
+            "id": "stove",
+            "displayName": "Stovetop",
+            "ingredients": [
+                { "name": "Flour", "quantity": "200 g", "alternatives": ["gluten-free flour"], "tips": ["Sift for fluffier pancakes"] },
+                { "name": "Milk", "quantity": "300 ml", "alternatives": ["oat milk", "almond milk"] },
+                { "name": "Eggs", "quantity": "2", "tips": ["Room temperature mixes better"] },
+                { "name": "Butter", "quantity": "20 g", "alternatives": ["vegetable oil (1 tbsp)"] },
+                { "name": "Sugar", "quantity": "2 tbsp" },
+                { "name": "Baking powder", "quantity": "1 tsp" },
+                { "name": "Salt", "quantity": "pinch" }
+            ],
+            "steps": [
+                { "description": "Mix dry ingredients: flour, sugar, baking powder, and salt in a large bowl.", "durationMinutes": 2, "tips": ["Sift together for even distribution"] },
+                { "description": "Make a well in the center and pour in milk, eggs, and melted butter.", "durationMinutes": 1 },
+                { "description": "Whisk until just combined — lumps are fine. Don't overmix.", "durationMinutes": 1, "tips": ["A few lumps ensure tender pancakes"] },
+                { "description": "Heat a non-stick pan or griddle over medium heat. Add a small knob of butter.", "durationMinutes": 2 },
+                { "description": "Pour a ladle of batter (about ¼ cup per pancake). Cook until bubbles form on surface.", "durationMinutes": 3, "tips": ["Bubbles that don't pop mean it's time to flip"] },
+                { "description": "Flip and cook until golden brown, about 1-2 minutes more.", "durationMinutes": 2 }
+            ]
+        },
+        {
+            "id": "microwave",
+            "displayName": "Microwave Mug Pancake",
+            "ingredients": [
+                { "name": "Flour", "quantity": "4 tbsp" },
+                { "name": "Milk", "quantity": "3 tbsp" },
+                { "name": "Egg", "quantity": "1" },
+                { "name": "Butter", "quantity": "1 tsp", "alternatives": ["vegetable oil"] },
+                { "name": "Sugar", "quantity": "1 tbsp" }
+            ],
+            "steps": [
+                { "description": "Mix flour, sugar, and a pinch of salt in a microwave-safe mug.", "durationMinutes": 1 },
+                { "description": "Add milk, egg, and melted butter. Stir until smooth.", "durationMinutes": 1, "tips": ["Make sure there are no dry flour pockets at the bottom"] },
+                { "description": "Microwave on high for 90 seconds. Check if center is set.", "durationMinutes": 1, "tips": ["If still wet in center, add 15-30 seconds more"] },
+                { "description": "Let cool for 1 minute before eating from the mug.", "durationMinutes": 1 }
+            ]
+        }
+    ]
+}

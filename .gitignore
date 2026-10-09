@@ -1,18 +1,36 @@
-# Built artifacts
-*.apk
-*.ap_
-*.aab
-build/
-app/build/
-
 # Gradle
 .gradle/
-gradle/wrapper/gradle-wrapper.jar
+build/
+!gradle/wrapper/gradle-wrapper.jar
 
-# Android
-*.iml
-.idea/
+# Local configuration (machine specific, may contain secrets)
 local.properties
+keystore.properties
+*.jks
+*.keystore
 
-# OS
+# Android Studio / IntelliJ
+.idea/
+*.iml
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Generated Android output
+*.apk
+*.aab
+*.ap_
+*.dex
+bin/
+gen/
+out/
+
+# Logs
+*.log
+
+# OS files
 .DS_Store
+Thumbs.db
+
+# Design exports (Claude Design / Simmer)
+Design/
