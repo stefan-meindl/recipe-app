@@ -152,7 +152,7 @@ Resolve-time checks (the contract):
 
 ### 7.1 Invalid conditions MUST throw
 
-A resolver MUST throw an error that names the offending string and the rule broken, for example `Invalid condition "rice>pot": no operator (expected key=value, key!=value, add:id or !add:id)`. It MUST NOT return true or false for these. In an array, one invalid element makes the whole condition an error. Elements are never skipped and evaluation never short-circuits past an invalid element: the whole array is validated before it is evaluated.
+A resolver MUST throw an error that names the offending string and the rule broken, for example `Invalid condition "rice>pot": no operator (expected key=value, key!=value, add:id or !add:id)`. It MUST NOT return true or false for these. In an array, evaluation stops at the first element that does not hold (`Array.prototype.every` short-circuits), so a throwing element only fires when every element before it holds. An array is an error only if a held element is invalid; a false element before it short-circuits and the array is simply not satisfied.
 
 The "Current JS" column is derived by reading `cond()` (lines 226-233), not by running it. `sel` is the selection; "key unset" means `sel.choice[key]` is `undefined`. The rows use the selection `{choice:{mince:"beef", rice:"pot"}, add:{}}` — the natural default for the worked example. A row says "does not hold" when `cond()` returns false for this selection, and "HOLDS, silently" when it wrongly returns true.
 
