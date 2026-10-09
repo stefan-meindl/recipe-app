@@ -32,9 +32,6 @@ out/
 .DS_Store
 Thumbs.db
 
-# Design exports (Claude Design / Simmer)
-Design/
-
 # StarNet workshop scratch
 workshop/
 

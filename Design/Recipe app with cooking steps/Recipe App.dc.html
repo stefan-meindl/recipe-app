@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/simmer-design-system-b07db28f-f7b9-41d9-a368-1a28b85f1c50/styles.css">
+<script src="_ds/simmer-design-system-b07db28f-f7b9-41d9-a368-1a28b85f1c50/_ds_bundle.js"></script>
+<script src="simmer-data.js"></script>
+<style>body{margin:0;background:var(--color-cream);color:var(--text-primary);font-family:var(--font-sans)}a{color:var(--text-link)}a:hover{color:var(--text-link);text-decoration:underline}button{-webkit-tap-highlight-color:transparent}</style>
+</helmet>
+<div style="min-height:100vh;display:flex;flex-wrap:wrap;gap:48px;justify-content:center;align-items:flex-start;padding:48px 32px;box-sizing:border-box">
+  <aside style="flex:0 1 280px;display:flex;flex-direction:column;gap:20px;padding-top:24px">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <span style="font:var(--type-micro-uppercase);letter-spacing:var(--tracking-micro-uppercase);text-transform:uppercase;color:var(--text-tertiary)">Simmer · prototype</span>
+      <h1 style="margin:0;font:400 44px/1.05 var(--font-display);letter-spacing:-0.5px">Recipe flow.</h1>
+      <p style="margin:0;font:var(--type-body-sm);color:var(--text-secondary);text-wrap:pretty">Browse and filter, then cook in three steps: servings and variations, preparation methods, cooking.</p>
+    </div>
+    <nav style="display:flex;flex-direction:column;gap:4px">
+      <button onClick="{{ jumpOverview }}" style="display:flex;align-items:center;gap:10px;min-height:44px;padding:0 12px;border:var(--border-width) solid var(--border-warm);border-radius:var(--radius-md);background:var(--surface-card);font:var(--type-body-sm-medium);color:var(--text-primary);text-align:left;cursor:pointer">Overview and filters</button>
+      <button onClick="{{ jumpServings }}" style="display:flex;align-items:center;gap:10px;min-height:44px;padding:0 12px;border:var(--border-width) solid var(--border-warm);border-radius:var(--radius-md);background:var(--surface-card);font:var(--type-body-sm-medium);color:var(--text-primary);text-align:left;cursor:pointer"><span style="font:var(--type-caption-bold);color:var(--text-accent)">1</span>Servings and variations</button>
+      <button onClick="{{ jumpPrep }}" style="display:flex;align-items:center;gap:10px;min-height:44px;padding:0 12px;border:var(--border-width) solid var(--border-warm);border-radius:var(--radius-md);background:var(--surface-card);font:var(--type-body-sm-medium);color:var(--text-primary);text-align:left;cursor:pointer"><span style="font:var(--type-caption-bold);color:var(--text-accent)">2</span>Preparation methods</button>
+      <button onClick="{{ jumpCook }}" style="display:flex;align-items:center;gap:10px;min-height:44px;padding:0 12px;border:var(--border-width) solid var(--border-warm);border-radius:var(--radius-md);background:var(--surface-card);font:var(--type-body-sm-medium);color:var(--text-primary);text-align:left;cursor:pointer"><span style="font:var(--type-caption-bold);color:var(--text-accent)">3</span>Cooking</button>
+      <button onClick="{{ jumpShopping }}" style="display:flex;align-items:center;gap:10px;min-height:44px;padding:0 12px;border:var(--border-width) solid var(--border-warm);border-radius:var(--radius-md);background:var(--surface-card);font:var(--type-body-sm-medium);color:var(--text-primary);text-align:left;cursor:pointer">Shopping list</button>
+    </nav>
+    <ul style="margin:0;padding:0 0 0 18px;display:flex;flex-direction:column;gap:6px;font:var(--type-caption);color:var(--text-tertiary)">
+      <li>Chilli con carne and Thai green curry have variations; the others skip that section.</li>
+      <li>Steps are generated from your choices. Preparation always comes first.</li>
+      <li>Placeholder art stands in for food photography.</li>
+    </ul>
+  </aside>
+
+  <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" dark="{{ isDark }}" hint-size="402px,874px">
+    <div data-theme="{{ theme }}" style="height:100%;display:flex;flex-direction:column;background:var(--surface-page);color:var(--text-primary);font-family:var(--font-sans)">
+
+      <sc-if value="{{ isFlow }}" hint-placeholder-val="{{ false }}">
+        <header style="flex:none;display:flex;flex-direction:column;gap:12px;padding:58px 16px 12px;background:var(--surface-page);border-bottom:var(--border-width) solid var(--border-subtle)">
+          <div style="display:flex;align-items:center;gap:12px">
+            <button aria-label="Back to recipes" onClick="{{ toOverview }}" style="display:grid;place-items:center;width:44px;height:44px;flex:none;padding:0;border-radius:var(--radius-md);border:var(--border-width) solid var(--border-default);background:var(--surface-card);color:var(--text-primary);cursor:pointer"><x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Icon" name="arrow-left" size="{{ 20 }}" hint-size="20px,20px"></x-import></button>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+              <span style="font:var(--type-body-sm-medium);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.title }}</span>
+              <span style="font:var(--type-caption);color:var(--text-tertiary)">{{ flowCaption }}</span>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+            <sc-for list="{{ flowSteps }}" as="fs" hint-placeholder-count="3">
+              <button onClick="{{ fs.onClick }}" disabled="{{ fs.isTodo }}" style="display:flex;flex-direction:column;gap:6px;padding:0;border:0;background:transparent;text-align:left;cursor:pointer;font:inherit">
+                <sc-if value="{{ fs.isTodo }}"><span style="height:4px;width:100%;border-radius:var(--radius-full);background:var(--border-subtle)"></span><span style="font:var(--type-micro);color:var(--text-muted)">{{ fs.n }} · {{ fs.label }}</span></sc-if>
+                <sc-if value="{{ fs.isCurrent }}"><span style="height:4px;width:100%;border-radius:var(--radius-full);background:var(--accent)"></span><span style="font:var(--type-micro);color:var(--text-accent)">{{ fs.n }} · {{ fs.label }}</span></sc-if>
+                <sc-if value="{{ fs.isDone }}"><span style="height:4px;width:100%;border-radius:var(--radius-full);background:var(--accent)"></span><span style="font:var(--type-micro);color:var(--text-secondary)">{{ fs.n }} · {{ fs.label }}</span></sc-if>
+              </button>
+            </sc-for>
+          </div>
+        </header>
+      </sc-if>
+
+      <div ref="{{ scrollRef }}" style="flex:1;min-height:0;overflow-y:auto;scrollbar-width:none;position:relative">
+
+        <sc-if value="{{ isOverview }}" hint-placeholder-val="{{ true }}">
+          <div data-screen-label="Overview" style="padding:64px 16px 24px;display:flex;flex-direction:column;gap:20px">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+              <h1 style="margin:0;font:400 40px/1.05 var(--font-display);letter-spacing:-0.5px;text-wrap:balance">What are we cooking?</h1>
+              <button aria-label="Switch theme" onClick="{{ toggleTheme }}" style="display:grid;place-items:center;width:44px;height:44px;flex:none;padding:0;border-radius:var(--radius-md);border:var(--border-width) solid var(--border-default);background:var(--surface-card);color:var(--text-primary);cursor:pointer"><x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Icon" name="{{ themeIcon }}" size="{{ 20 }}" hint-size="20px,20px"></x-import></button>
+            </div>
+            <x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.TextInput" icon-left="search" placeholder="Search recipes or ingredients" aria-label="Search recipes" value="{{ q }}" onChange="{{ onQ }}" hint-size="100%,44px"></x-import>
+
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div style="margin:0 -16px;padding:0 16px;overflow-x:auto;scrollbar-width:none">
+                <x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.SegmentedTabs" items="{{ catItems }}" value="{{ cat }}" onChange="{{ onCat }}" aria-label="Category" hint-size="100%,44px"></x-import>
+              </div>
+              <div role="group" aria-label="Tags" style="display:flex;gap:8px;margin:0 -16px;padding:0 16px;overflow-x:auto;scrollbar-width:none">
+                <sc-for list="{{ tagChips }}" as="tg" hint-placeholder-count="5">
+                  <sc-if value="{{ tg.on }}">
+                    <button aria-pressed="true" onClick="{{ tg.onClick }}" style="flex:none;display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 14px 0 10px;border-radius:var(--radius-full);border:var(--border-width) solid var(--surface-inverse);background:var(--surface-inverse);color:var(--text-inverse);font:var(--type-body-sm-medium);cursor:pointer"><x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Icon" name="check" size="{{ 16 }}" hint-size="16px,16px"></x-import>{{ tg.label }}</button>
+                  </sc-if>
+                  <sc-if value="{{ tg.off }}">
+                    <button aria-pressed="false" onClick="{{ tg.onClick }}" style="flex:none;display:inline-flex;align-items:center;height:40px;padding:0 14px;border-radius:var(--radius-full);border:var(--border-width) solid var(--border-default);background:var(--surface-card);color:var(--text-secondary);font:var(--type-body-sm-medium);cursor:pointer">{{ tg.label }}</button>
+                  </sc-if>
+                </sc-for>
+              </div>
+            </div>
+
+            <sc-if value="{{ hasPlanned }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <span style="font:var(--type-micro-uppercase);letter-spacing:var(--tracking-micro-uppercase);text-transform:uppercase;color:var(--text-tertiary)">Planned</span>
+                <sc-for list="{{ planned }}" as="pl" hint-placeholder-count="1">
+                  <div style="display:flex;align-items:center;gap:12px;padding:12px 12px 12px 16px;border-radius:var(--radius-card);background:var(--surface-warm);border:var(--border-width) solid var(--border-warm)">
+                    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                      <span style="font:var(--type-body-md-medium);color:var(--text-on-warm)">{{ pl.title }}</span>
+                      <span style="font:var(--type-caption);color:var(--text-secondary)">{{ pl.summary }}</span>
+                    </div>
+                    <x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Button" variant="on-cream" icon-right="arrow-right" onClick="{{ pl.onContinue }}" hint-size="110px,44px">Continue</x-import>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <div style="display:flex;align-items:center;justify-content:space-between;min-height:24px">
+              <span style="font:var(--type-caption);color:var(--text-tertiary)">{{ resultCount }}</span>
+              <sc-if value="{{ filtersActive }}"><x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Button" variant="link" onClick="{{ clearFilters }}" hint-size="90px,24px">Clear filters</x-import></sc-if>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <sc-for list="{{ results }}" as="rc" hint-placeholder-count="3">
+                <button onClick="{{ rc.onOpen }}" style="display:block;width:100%;padding:0;border:0;background:transparent;text-align:left;font:inherit;color:inherit;cursor:pointer">
+                  <x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Card" padding="{{ 0 }}" hint-size="100%,220px" style="display:block;width:100%">
+                    <div style="height:120px;display:grid;place-items:center;background:var(--gradient-hero);color:var(--text-primary);border-radius:10px 10px 0 0"><x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Icon" name="{{ rc.icon }}" size="{{ 44 }}" hint-size="44px,44px"></x-import></div>
+                    <div style="display:flex;flex-direction:column;gap:8px;padding:16px;border-top:var(--border-width) solid var(--border-subtle)">
+                      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                        <span style="font:var(--type-heading-5);color:var(--text-primary)">{{ rc.title }}</span>
+                        <x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Badge" variant="cream" hint-size="60px,22px">{{ rc.category }}</x-import>
+                      </div>
+                      <div style="display:flex;flex-wrap:wrap;gap:6px 14px;font:var(--type-caption);color:var(--text-tertiary)">
+                        <span style="display:inline-flex;align-items:center;gap:6px"><x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Icon" name="clock" size="{{ 14 }}" hint-size="14px,14px"></x-import>{{ rc.time }}</span>
+                        <span style="display:inline-flex;align-items:center;gap:6px"><x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Icon" name="flame" size="{{ 14 }}" hint-size="14px,14px"></x-import>{{ rc.difficulty }}</span>
+                        <sc-if value="{{ rc.hasVariations }}"><span style="display:inline-flex;align-items:center;gap:6px;color:var(--text-accent)"><x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Icon" name="sparkles" size="{{ 14 }}" hint-size="14px,14px"></x-import>{{ rc.variationText }}</span></sc-if>
+                      </div>
+                      <span style="font:var(--type-caption);color:var(--text-secondary)">{{ rc.tagsText }}</span>
+                    </div>
+                  </x-import>
+                </button>
+              </sc-for>
+              <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:32px 16px;text-align:center;border:var(--border-width) dashed var(--border-default);border-radius:var(--radius-card)">
+                  <span style="font:var(--type-body-md-medium)">No recipes match these filters.</span>
+                  <x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Button" variant="secondary" onClick="{{ clearFilters }}" hint-size="120px,44px">Clear filters</x-import>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isFlow1 }}" hint-placeholder-val="{{ false }}">
+          <div data-screen-label="1 Servings" style="padding:16px 16px 24px;display:flex;flex-direction:column;gap:28px">
+            <div style="display:flex;flex-direction:column;gap:12px;padding:20px;border-radius:var(--radius-xl);background:var(--gradient-hero)">
+              <span style="font:var(--type-micro-uppercase);letter-spacing:var(--tracking-micro-uppercase);text-transform:uppercase;color:var(--text-primary)">{{ r.category }}</span>
+              <h2 style="margin:0;font:400 38px/1.05 var(--font-display);letter-spacing:-0.5px;text-wrap:balance">{{ r.title }}</h2>
+              <p style="margin:0;font:var(--type-body-md);color:var(--text-hero);text-wrap:pretty">{{ r.summary }}</p>
+              <div style="display:flex;flex-wrap:wrap;gap:16px;font:var(--type-body-sm);color:var(--text-hero)">
+                <span style="display:inline-flex;align-items:center;gap:6px"><x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Icon" name="clock" size="{{ 16 }}" hint-size="16px,16px"></x-import>{{ r.time }}</span>
+                <span style="display:inline-flex;align-items:center;gap:6px"><x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Icon" name="flame" size="{{ 16 }}" hint-size="16px,16px"></x-import>{{ r.difficulty }}</span>
+              </div>
+            </div>
+
+            <section style="display:flex;align-items:center;justify-content:space-between;gap:16px">
+              <div style="display:flex;flex-direction:column;gap:2px">
+                <h3 style="margin:0;font:var(--type-heading-5)">Servings</h3>
+                <span style="font:var(--type-caption);color:var(--text-tertiary)">Amounts update as you change this.</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:4px">
+                <button aria-label="Fewer servings" onClick="{{ dec }}" style="display:grid;place-items:center;width:44px;height:44px;padding:0;border-radius:var(--radius-md);border:var(--border-width) solid var(--border-strong);background:var(--surface-card);color:var(--text-primary);cursor:pointer"><x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Icon" name="minus" size="{{ 20 }}" hint-size="20px,20px"></x-import></button>
+                <span aria-live="polite" style="min-width:52px;text-align:center;font:400 36px/1 var(--font-display);font-variant-numeric:tabular-nums">{{ servings }}</span>
+                <button aria-label="More servings" onClick="{{ inc }}" style="display:grid;place-items:center;width:44px;height:44px;padding:0;border-radius:var(--radius-md);border:var(--border-width) solid var(--border-strong);background:var(--surface-card);color:var(--text-primary);cursor:pointer"><x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Icon" name="plus" size="{{ 20 }}" hint-size="20px,20px"></x-import></button>
+              </div>
+            </section>
+
+            <sc-if value="{{ hasVariations }}" hint-placeholder-val="{{ true }}">
+              <section style="display:flex;flex-direction:column;gap:16px">
+                <div style="display:flex;flex-direction:column;gap:2px">
+                  <h3 style="margin:0;font:var(--type-heading-5)">Make it your way</h3>
+                  <span style="font:var(--type-caption);color:var(--text-tertiary)">Optional swaps and additions. They change the ingredients and steps.</span>
+                </div>
+                <sc-for list="{{ swaps }}" as="sw" hint-placeholder-count="1">
+                  <div style="display:flex;flex-direction:column;gap:8px">
+                    <span style="font:var(--type-body-sm-medium);color:var(--text-secondary)">{{ sw.label }}</span>
+                    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
+                      <sc-for list="{{ sw.options }}" as="so" hint-placeholder-count="2">
+                        <sc-if value="{{ so.on }}"><button aria-pressed="true" onClick="{{ so.onClick }}" style="min-height:48px;padding:0 12px;border-radius:var(--radius-md);border:var(--border-width-strong) solid var(--border-accent);background:var(--surface-card);color:var(--text-primary);font:var(--type-body-sm-medium);cursor:pointer">{{ so.l }}</button></sc-if>
+                        <sc-if value="{{ so.off }}"><button aria-pressed="false" onClick="{{ so.onClick }}" style="min-height:48px;padding:0 12px;border-radius:var(--radius-md);border:var(--border-width) solid var(--border-default);background:var(--surface-card);color:var(--text-secondary);font:var(--type-body-sm-medium);cursor:pointer">{{ so.l }}</button></sc-if>
+                      </sc-for>
+                    </div>
+                  </div>
+                </sc-for>
+                <div style="display:flex;flex-direction:column;border-radius:var(--radius-card);border:var(--border-width) solid var(--border-subtle);overflow:hidden">
+                  <sc-for list="{{ addins }}" as="ad" hint-placeholder-count="3">
+                    <sc-if value="{{ ad.notFirst }}"><div style="height:2px;background:var(--border-subtle)"></div></sc-if>
+                    <button role="checkbox" aria-checked="{{ ad.ariaChecked }}" onClick="{{ ad.onClick }}" style="display:flex;align-items:center;gap:14px;width:100%;min-height:64px;padding:12px 16px;border:0;background:var(--surface-card);color:var(--text-primary);text-align:left;font:inherit;cursor:pointer">
+                      <sc-if value="{{ ad.on }}"><span style="display:grid;place-items:center;flex:none;width:24px;height:24px;box-sizing:border-box;border-radius:var(--radius-sm);background:var(--accent);border:var(--border-width) solid var(--accent);color:var(--accent-fg)"><x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Icon" name="check" size="{{ 16 }}" hint-size="16px,16px"></x-import></span></sc-if>
+                      <sc-if value="{{ ad.off }}"><span style="flex:none;width:24px;height:24px;box-sizing:border-box;border-radius:var(--radius-sm);border:var(--border-width) solid var(--border-strong)"></span></sc-if>
+                      <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                        <span style="font:var(--type-body-md-medium)">{{ ad.label }}</span>
+                        <span style="font:var(--type-caption);color:var(--text-tertiary)">{{ ad.d }}</span>
+                      </span>
+                      <span style="font:var(--type-body-sm-medium);color:var(--text-secondary);white-space:nowrap">{{ ad.amount }}</span>
+                    </button>
+                  </sc-for>
+                </div>
+              </section>
+            </sc-if>
+
+            <section style="display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;align-items:baseline;justify-content:space-between">
+                <h3 style="margin:0;font:var(--type-heading-5)">Ingredients</h3>
+                <span style="font:var(--type-caption);color:var(--text-tertiary)">{{ ingCaption }}</span>
+              </div>
+              <div style="display:flex;flex-direction:column;border-radius:var(--radius-card);border:var(--border-width) solid var(--border-subtle);overflow:hidden">
+                <sc-for list="{{ ingredients }}" as="ig" hint-placeholder-count="8">
+                  <div style="display:flex;align-items:center;gap:12px;min-height:52px;padding:10px 16px;border-top:var(--border-width) solid var(--border-subtle);margin-top:-2px">
+                    <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                      <span style="display:flex;align-items:center;gap:8px;font:var(--type-body-md)">{{ ig.name }}<sc-if value="{{ ig.variation }}"><span style="font:var(--type-micro);color:var(--text-accent)">Your pick</span></sc-if></span>
+                      <sc-if value="{{ ig.hasNote }}"><span style="font:var(--type-caption);color:var(--text-tertiary)">{{ ig.note }}</span></sc-if>
+                    </span>
+                    <span style="font:var(--type-body-sm-medium);color:var(--text-secondary);white-space:nowrap">{{ ig.amount }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </section>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isFlow2 }}" hint-placeholder-val="{{ false }}">
+          <div data-screen-label="2 Preparation" style="padding:24px 16px;display:flex;flex-direction:column;gap:28px">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <h2 style="margin:0;font:400 38px/1.05 var(--font-display);letter-spacing:-0.5px">How will you cook it?</h2>
+              <p style="margin:0;font:var(--type-body-md);color:var(--text-secondary)">Your choices set the steps and timers for {{ servings }} servings.</p>
+            </div>
+            <sc-for list="{{ methods }}" as="m" hint-placeholder-count="2">
+              <section style="display:flex;flex-direction:column;gap:12px">
+                <div style="display:flex;flex-direction:column;gap:2px">
+                  <span style="font:var(--type-micro-uppercase);letter-spacing:var(--tracking-micro-uppercase);text-transform:uppercase;color:var(--text-tertiary)">{{ m.label }}</span>
+                  <h3 style="margin:0;font:var(--type-heading-5)">{{ m.q }}</h3>
+                </div>
+                <div role="radiogroup" aria-label="{{ m.q }}" style="display:flex;flex-direction:column;gap:8px">
+                  <sc-for list="{{ m.options }}" as="o" hint-placeholder-count="3">
+                    <button role="radio" aria-checked="{{ o.ariaChecked }}" onClick="{{ o.onClick }}" style="display:flex;align-items:center;gap:14px;width:100%;padding:{{ o.pad }};border-radius:var(--radius-card);border:{{ o.border }};background:var(--surface-card);color:var(--text-primary);text-align:left;font:inherit;cursor:pointer">
+                      <span style="display:grid;place-items:center;flex:none;width:40px;height:40px;box-sizing:border-box;border-radius:var(--radius-md);background:var(--surface-warm);border:var(--border-width) solid var(--border-warm)"><x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Icon" name="{{ o.icon }}" size="{{ 20 }}" hint-size="20px,20px"></x-import></span>
+                      <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                        <span style="font:var(--type-body-md-medium)">{{ o.l }}</span>
+                        <span style="font:var(--type-caption);color:var(--text-tertiary)">{{ o.d }}</span>
+                      </span>
+                      <span style="font:var(--type-body-sm-medium);color:var(--text-secondary);white-space:nowrap">{{ o.time }}</span>
+                    </button>
+                  </sc-for>
+                </div>
+              </section>
+            </sc-for>
+            <div style="display:flex;gap:12px;align-items:flex-start;padding:16px;border-radius:var(--radius-card);background:var(--surface-warm);border:var(--border-width) solid var(--border-warm);color:var(--text-on-warm)">
+              <x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Icon" name="list-checks" size="{{ 20 }}" hint-size="20px,20px"></x-import>
+              <div style="display:flex;flex-direction:column;gap:2px">
+                <span style="font:var(--type-body-sm-medium)">{{ planText }}</span>
+                <span style="font:var(--type-caption);color:var(--text-secondary)">Preparation comes first, so everything is ready when the pan is hot.</span>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isFlow3 }}" hint-placeholder-val="{{ false }}">
+          <div data-screen-label="3 Cooking" style="padding:16px 16px 32px;display:flex;flex-direction:column;gap:16px">
+            <sc-if value="{{ allDone }}">
+              <div style="display:flex;flex-direction:column;gap:16px;padding:24px 20px;border-radius:var(--radius-xl);background:var(--gradient-hero)">
+                <x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Icon" name="circle-check" size="{{ 32 }}" hint-size="32px,32px"></x-import>
+                <h2 style="margin:0;font:400 44px/1.05 var(--font-display);letter-spacing:-0.5px">Enjoy your meal.</h2>
+                <p style="margin:0;font:var(--type-body-md);color:var(--text-hero)">{{ r.title }} · {{ selSummary }}</p>
+                <x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Button" variant="dark" full-width="{{ true }}" onClick="{{ toOverview }}" hint-size="100%,44px">Back to recipes</x-import>
+              </div>
+            </sc-if>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px">
+                <span style="font:var(--type-body-sm-medium)">{{ progressText }}</span>
+                <span style="font:var(--type-caption);color:var(--text-tertiary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ selSummary }}</span>
+              </div>
+              <div style="height:4px;border-radius:var(--radius-full);background:var(--border-subtle);overflow:hidden"><div style="height:100%;width:{{ progressPct }};border-radius:var(--radius-full);background:var(--accent);transition:width 150ms ease"></div></div>
+            </div>
+            <p style="margin:0;display:flex;align-items:center;gap:8px;font:var(--type-caption);color:var(--text-tertiary)"><x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Icon" name="lightbulb" size="{{ 16 }}" hint-size="16px,16px"></x-import>Tap an underlined ingredient for its amount and tips.</p>
+
+            <sc-for list="{{ phases }}" as="ph" hint-placeholder-count="2">
+              <section style="display:flex;flex-direction:column;gap:12px;padding-top:8px">
+                <div style="display:flex;flex-direction:column;gap:2px">
+                  <h3 style="margin:0;font:var(--type-heading-5)">{{ ph.title }}</h3>
+                  <span style="font:var(--type-caption);color:var(--text-tertiary)">{{ ph.caption }}</span>
+                </div>
+                <sc-for list="{{ ph.steps }}" as="s" hint-placeholder-count="3">
+                  <div data-step="{{ s.id }}">
+                    <sc-if value="{{ s.isDone }}">
+                      <div style="display:flex;align-items:center;gap:12px;min-height:56px;padding:6px 8px 6px 16px;box-sizing:border-box;border-radius:var(--radius-card);border:var(--border-width) solid var(--border-subtle);background:var(--surface-subtle)">
+                        <span style="display:grid;place-items:center;flex:none;width:24px;height:24px;border-radius:var(--radius-full);background:var(--accent);color:var(--accent-fg)"><x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Icon" name="check" size="{{ 14 }}" hint-size="14px,14px"></x-import></span>
+                        <span style="flex:1;min-width:0;display:flex;flex-direction:column">
+                          <span style="font:var(--type-micro);color:var(--text-tertiary)">{{ s.label }}</span>
+                          <span style="font:var(--type-body-sm-medium);color:var(--text-tertiary);text-decoration:line-through;text-decoration-thickness:2px">{{ s.title }}</span>
+                        </span>
+                        <button onClick="{{ s.onUndo }}" style="min-height:44px;padding:0 12px;border:0;background:transparent;color:var(--text-link);font:var(--type-body-sm-medium);cursor:pointer">Undo</button>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ s.isOpen }}">
+                      <section style="display:flex;flex-direction:column;gap:12px;padding:{{ s.pad }};border-radius:var(--radius-card);background:var(--surface-card);border:{{ s.border }}">
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px">
+                          <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+                            <span style="font:var(--type-micro-uppercase);letter-spacing:var(--tracking-micro-uppercase);text-transform:uppercase;color:{{ s.eyebrowColor }}">{{ s.label }}</span>
+                            <h4 style="margin:0;font:var(--type-heading-4);text-wrap:balance">{{ s.title }}</h4>
+                          </div>
+                          <x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.StepTimer" duration="{{ s.duration }}" hint-size="88px,44px"></x-import>
+                        </div>
+                        <sc-for list="{{ s.warnings }}" as="w" hint-placeholder-count="0">
+                          <sc-if value="{{ warnBanner }}">
+                            <div role="note" style="display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:var(--radius-md);background:var(--surface-warm);border:var(--border-width) solid var(--border-accent);color:var(--text-on-warm)">
+                              <span style="flex:none;display:flex;padding-top:1px;color:var(--text-accent)"><x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Icon" name="circle-alert" size="{{ 18 }}" hint-size="18px,18px"></x-import></span>
+                              <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                                <span style="font:var(--type-body-sm-medium)">Needs {{ w.label }} first</span>
+                                <span style="font:var(--type-caption);color:var(--text-secondary)">{{ w.title }}</span>
+                              </span>
+                              <button onClick="{{ w.onJump }}" style="align-self:center;min-height:36px;padding:0 4px;border:0;background:transparent;color:var(--text-link);font:var(--type-caption-bold);cursor:pointer">Go to step</button>
+                            </div>
+                          </sc-if>
+                          <sc-if value="{{ warnInline }}">
+                            <button onClick="{{ w.onJump }}" style="align-self:flex-start;display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:0 10px 0 8px;border-radius:var(--radius-full);border:var(--border-width) solid var(--border-accent);background:var(--surface-warm);color:var(--text-on-warm);font:var(--type-micro);cursor:pointer"><span style="display:flex;color:var(--text-accent)"><x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Icon" name="circle-alert" size="{{ 14 }}" hint-size="14px,14px"></x-import></span>Needs {{ w.label }} · {{ w.title }}</button>
+                          </sc-if>
+                        </sc-for>
+                        <sc-for list="{{ s.ready }}" as="rd" hint-placeholder-count="0">
+                          <span style="display:inline-flex;align-items:center;gap:6px;font:var(--type-caption);color:var(--text-tertiary)"><x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Icon" name="circle-check" size="{{ 14 }}" hint-size="14px,14px"></x-import>{{ rd.label }} done · {{ rd.title }}</span>
+                        </sc-for>
+                        <p style="margin:0;font:var(--type-body-md);color:var(--text-secondary);text-wrap:pretty"><sc-for list="{{ s.segs }}" as="sg" hint-placeholder-count="1"><sc-if value="{{ sg.isIng }}"><x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Ingredient" name="{{ sg.name }}" amount="{{ sg.amount }}" note="{{ sg.note }}" tips="{{ sg.tips }}" hint-size="auto,auto">{{ sg.t }}</x-import></sc-if><sc-if value="{{ sg.isText }}">{{ sg.t }}</sc-if></sc-for></p>
+                        <div style="height:2px;background:var(--border-subtle);margin:4px 0"></div>
+                        <sc-if value="{{ s.isActive }}"><x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Button" variant="dark" icon-left="check" full-width="{{ true }}" onClick="{{ s.onDone }}" hint-size="100%,44px">Mark as done</x-import></sc-if>
+                        <sc-if value="{{ s.notActive }}"><x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Button" variant="secondary" icon-left="check" full-width="{{ true }}" onClick="{{ s.onDone }}" hint-size="100%,44px">Mark as done</x-import></sc-if>
+                      </section>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </section>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isShopping }}" hint-placeholder-val="{{ false }}">
+          <div data-screen-label="Shopping list" style="padding:64px 16px 24px">
+            <x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.ShoppingList" items="{{ items }}" onChange="{{ setItems }}" allow-add="{{ true }}" hint-size="100%,500px"></x-import>
+          </div>
+        </sc-if>
+      </div>
+
+      <sc-if value="{{ isFlow1 }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:none;display:flex;flex-direction:column;gap:10px;padding:12px 16px 30px;background:var(--surface-page);border-top:var(--border-width) solid var(--border-subtle)">
+          <sc-if value="{{ hasToast }}">
+            <div role="status" style="display:flex;align-items:center;gap:10px;padding:10px 8px 10px 14px;border-radius:var(--radius-card);background:var(--surface-warm);border:var(--border-width) solid var(--border-warm);color:var(--text-on-warm)">
+              <span style="display:flex;color:var(--text-accent)"><x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Icon" name="circle-check" size="{{ 20 }}" hint-size="20px,20px"></x-import></span>
+              <span style="flex:1;min-width:0;display:flex;flex-direction:column">
+                <span style="font:var(--type-body-sm-medium)">{{ toastText }}</span>
+                <span style="font:var(--type-caption);color:var(--text-secondary)">Find it under Planned on Recipes.</span>
+              </span>
+              <button onClick="{{ viewList }}" style="min-height:44px;padding:0 8px;border:0;background:transparent;color:var(--text-link);font:var(--type-body-sm-medium);cursor:pointer">View list</button>
+            </div>
+          </sc-if>
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:12px">
+            <sc-if value="{{ notAdded }}"><x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Button" variant="secondary" icon-left="shopping-cart" full-width="{{ true }}" onClick="{{ addToList }}" hint-size="100%,44px">Add to list</x-import></sc-if>
+            <sc-if value="{{ isAdded }}"><x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Button" variant="secondary" icon-left="check" full-width="{{ true }}" onClick="{{ viewList }}" hint-size="100%,44px">On your list</x-import></sc-if>
+            <x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Button" variant="primary" icon-right="arrow-right" full-width="{{ true }}" onClick="{{ toFlow2 }}" hint-size="100%,44px">Preparation</x-import>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ isFlow2 }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:none;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:12px;padding:12px 16px 30px;background:var(--surface-page);border-top:var(--border-width) solid var(--border-subtle)">
+          <x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Button" variant="secondary" icon-left="arrow-left" full-width="{{ true }}" onClick="{{ toFlow1 }}" hint-size="100%,44px">Back</x-import>
+          <x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Button" variant="primary" icon-left="play" full-width="{{ true }}" onClick="{{ toFlow3 }}" hint-size="100%,44px">Start cooking</x-import>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ showTabs }}" hint-placeholder-val="{{ true }}">
+        <nav aria-label="Main" style="flex:none;display:grid;grid-template-columns:1fr 1fr;padding:6px 12px 30px;background:var(--surface-page);border-top:var(--border-width) solid var(--border-subtle)">
+          <button aria-current="{{ recipesCurrent }}" onClick="{{ toOverview }}" style="display:flex;flex-direction:column;align-items:center;gap:4px;min-height:52px;padding:6px 0;border:0;background:transparent;color:{{ recipesTabColor }};font:var(--type-micro);cursor:pointer"><x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Icon" name="utensils" size="{{ 24 }}" hint-size="24px,24px"></x-import>Recipes</button>
+          <button aria-current="{{ shoppingCurrent }}" onClick="{{ toShopping }}" style="display:flex;flex-direction:column;align-items:center;gap:4px;min-height:52px;padding:6px 0;border:0;background:transparent;color:{{ shoppingTabColor }};font:var(--type-micro);cursor:pointer">
+            <span style="position:relative;display:flex"><x-import component-from-global-scope="SubtleGradientDesignSystem_b07db2.Icon" name="shopping-basket" size="{{ 24 }}" hint-size="24px,24px"></x-import><sc-if value="{{ hasLeft }}"><span style="position:absolute;top:-6px;left:16px;min-width:18px;height:18px;padding:0 5px;border-radius:var(--radius-full);background:var(--accent);color:var(--accent-fg);font:600 11px/18px var(--font-sans);text-align:center;border:var(--border-width) solid var(--surface-page);box-sizing:content-box">{{ left }}</span></sc-if></span>
+            Shopping list
+          </button>
+        </nav>
+      </sc-if>
+    </div>
+  </x-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;'light' | 'dark'&quot;},&quot;startScreen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;overview&quot;,&quot;servings&quot;,&quot;preparation&quot;,&quot;cooking&quot;,&quot;shopping&quot;],&quot;default&quot;:&quot;overview&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;warningStyle&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;banner&quot;,&quot;inline&quot;],&quot;default&quot;:&quot;banner&quot;,&quot;tsType&quot;:&quot;'banner' | 'inline'&quot;,&quot;section&quot;:&quot;Cooking&quot;}}">
+class Component extends DCLogic {
+  state = {
+    ready: !!window.SIMMER, theme: null, screen: 'overview', rid: 'chilli', flow: 1, servings: 4,
+    sel: { choice: {}, add: {} }, done: {}, cat: 'All', tags: {}, q: '',
+    items: [
+      { id: 'x1', name: 'Milk', amount: '1 l', category: 'Dairy' },
+      { id: 'x2', name: 'Sourdough loaf', amount: '1', category: 'Bakery' },
+    ],
+    planned: {}, toast: null, addedSig: null,
+  };
+  scrollRef = React.createRef();
+
+  componentDidMount() {
+    const boot = () => {
+      if (!window.SIMMER) return void setTimeout(boot, 50);
+      this.setState({ ready: true }, () => this.applyStart(this.props.startScreen));
+    };
+    boot();
+  }
+  componentDidUpdate(prev) {
+    if (prev.startScreen !== this.props.startScreen && this.state.ready) this.applyStart(this.props.startScreen);
+    if (prev.theme !== this.props.theme) this.setState({ theme: null });
+  }
+  applyStart(s) {
+    if (!s || s === 'overview') return this.go({ screen: 'overview' });
+    if (s === 'shopping') return this.go({ screen: 'shopping' });
+    this.open('chilli', { servings: 1, preparation: 2, cooking: 3 }[s] || 1);
+  }
+  recipe(id) { return window.SIMMER.RECIPES.find((r) => r.id === (id || this.state.rid)); }
+  go(patch) {
+    this.setState(patch);
+    const el = this.scrollRef.current;
+    if (el) el.scrollTop = 0;
+  }
+  sig(rid, servings, sel) { return JSON.stringify([rid, servings, sel]); }
+  open(id, flow = 1) {
+    const r = this.recipe(id);
+    const p = this.state.planned[id];
+    const servings = p ? p.servings : r.base;
+    const sel = p ? JSON.parse(JSON.stringify(p.sel)) : window.SIMMER.defaults(r);
+    this.go({ screen: 'recipe', rid: id, flow, servings, sel, done: {}, toast: null, addedSig: p ? this.sig(id, servings, p.sel) : null });
+  }
+  summary(r, servings, sel) {
+    const bits = [servings + ' servings'];
+    r.variations.forEach((v) => {
+      const o = v.kind === 'swap' && sel.choice[v.id] !== v.def && v.options.find((x) => x.v === sel.choice[v.id]);
+      if (o) bits.push(o.l);
+      if (v.kind === 'add' && sel.add[v.id]) bits.push(v.label);
+    });
+    return bits.join(' · ');
+  }
+  addToList() {
+    const { rid, servings, sel, items, planned } = this.state;
+    const r = this.recipe();
+    const res = window.SIMMER.resolve(r, servings, sel);
+    const add = res.ingredients.filter((i) => i.aisle).map((i) => ({ id: rid + '-' + i.id, name: i.name, amount: i.amount, category: i.aisle, note: r.title }));
+    const keep = items.filter((i) => !i.id.startsWith(rid + '-'));
+    this.setState({
+      items: [...keep, ...add],
+      planned: { ...planned, [rid]: { servings, sel: JSON.parse(JSON.stringify(sel)) } },
+      toast: `Added ${add.length} items for ${servings} servings.`,
+      addedSig: this.sig(rid, servings, sel),
+    });
+  }
+  jumpTo(id) {
+    const box = this.scrollRef.current;
+    const el = box && box.querySelector('[data-step="' + id + '"]');
+    if (el) box.scrollTo({ top: el.offsetTop - 12, behavior: 'smooth' });
+  }
+
+  renderVals() {
+    const S = window.SIMMER;
+    const st = this.state;
+    const theme = st.theme || this.props.theme || 'light';
+    const base = {
+      theme, isDark: theme === 'dark', themeIcon: theme === 'dark' ? 'sun' : 'moon', scrollRef: this.scrollRef,
+      toggleTheme: () => this.setState({ theme: theme === 'dark' ? 'light' : 'dark' }),
+      jumpOverview: () => this.applyStart('overview'), jumpServings: () => this.applyStart('servings'),
+      jumpPrep: () => this.applyStart('preparation'), jumpCook: () => this.applyStart('cooking'), jumpShopping: () => this.applyStart('shopping'),
+      toOverview: () => this.go({ screen: 'overview' }), toShopping: () => this.go({ screen: 'shopping' }),
+    };
+    if (!st.ready || !S) return { ...base, isOverview: false, isFlow: false, showTabs: false };
+
+    const left = st.items.filter((i) => !i.checked).length;
+    const vals = {
+      ...base,
+      isOverview: st.screen === 'overview', isShopping: st.screen === 'shopping', isFlow: st.screen === 'recipe',
+      showTabs: st.screen !== 'recipe',
+      recipesCurrent: st.screen === 'overview' ? 'page' : undefined, shoppingCurrent: st.screen === 'shopping' ? 'page' : undefined,
+      recipesTabColor: st.screen === 'overview' ? 'var(--text-accent)' : 'var(--text-tertiary)',
+      shoppingTabColor: st.screen === 'shopping' ? 'var(--text-accent)' : 'var(--text-tertiary)',
+      left, hasLeft: left > 0,
+      items: st.items, setItems: (items) => this.setState({ items }),
+      warnBanner: (this.props.warningStyle ?? 'banner') === 'banner', warnInline: this.props.warningStyle === 'inline',
+    };
+
+    // Overview
+    const cats = ['All', ...Array.from(new Set(S.RECIPES.map((r) => r.category)))];
+    const q = st.q.trim().toLowerCase();
+    const activeTags = S.TAGS.filter((t) => st.tags[t]);
+    const list = S.RECIPES.filter((r) =>
+      (st.cat === 'All' || r.category === st.cat) &&
+      activeTags.every((t) => r.tags.includes(t)) &&
+      (!q || r.title.toLowerCase().includes(q) || r.ingredients.some((i) => i.name.toLowerCase().includes(q))));
+    Object.assign(vals, {
+      q: st.q, onQ: (e) => this.setState({ q: e.target.value }),
+      catItems: cats.map((c) => ({ value: c, label: c })), cat: st.cat, onCat: (cat) => this.setState({ cat }),
+      tagChips: S.TAGS.map((t) => ({ label: t, on: !!st.tags[t], off: !st.tags[t], onClick: () => this.setState({ tags: { ...st.tags, [t]: !st.tags[t] } }) })),
+      filtersActive: st.cat !== 'All' || activeTags.length > 0 || !!q,
+      clearFilters: () => this.setState({ cat: 'All', tags: {}, q: '' }),
+      resultCount: list.length === 1 ? '1 recipe' : list.length + ' recipes',
+      noResults: list.length === 0,
+      results: list.map((r) => {
+        const n = r.variations.length;
+        return {
+          title: r.title, category: r.category, icon: r.icon, time: S.fmtTime(r.time), difficulty: r.difficulty,
+          hasVariations: n > 0, variationText: n === 1 ? '1 variation' : n + ' variations',
+          tagsText: r.tags.join(' · '), onOpen: () => this.open(r.id, 1),
+        };
+      }),
+      planned: Object.entries(st.planned).map(([id, p]) => {
+        const r = this.recipe(id);
+        return { title: r.title, summary: this.summary(r, p.servings, p.sel), onContinue: () => this.open(id, 2) };
+      }),
+    });
+    vals.hasPlanned = vals.planned.length > 0;
+
+    // Recipe flow
+    const r = this.recipe();
+    const res = S.resolve(r, st.servings, st.sel);
+    const setSel = (fn) => this.setState((s) => { const sel = JSON.parse(JSON.stringify(s.sel)); fn(sel); return { sel, done: {} }; });
+    const toFlow = (f) => () => this.go({ flow: f });
+    const labels = ['Servings', 'Preparation', 'Cooking'];
+    const isAdded = st.addedSig === this.sig(st.rid, st.servings, st.sel);
+    Object.assign(vals, {
+      r: { title: r.title, category: r.category, summary: r.summary, time: S.fmtTime(r.time), difficulty: r.difficulty },
+      isFlow1: vals.isFlow && st.flow === 1, isFlow2: vals.isFlow && st.flow === 2, isFlow3: vals.isFlow && st.flow === 3,
+      flowCaption: `Step ${st.flow} of 3 · ${labels[st.flow - 1]}`,
+      flowSteps: labels.map((label, k) => ({ n: k + 1, label, isCurrent: st.flow === k + 1, isDone: k + 1 < st.flow, isTodo: k + 1 > st.flow, onClick: toFlow(k + 1) })),
+      toFlow1: toFlow(1), toFlow2: toFlow(2), toFlow3: toFlow(3),
+      servings: st.servings,
+      dec: () => this.setState((s) => ({ servings: Math.max(1, s.servings - 1) })),
+      inc: () => this.setState((s) => ({ servings: Math.min(12, s.servings + 1) })),
+      hasVariations: r.variations.length > 0,
+      swaps: r.variations.filter((v) => v.kind === 'swap').map((v) => ({
+        label: v.label,
+        options: v.options.map((o) => {
+          const on = st.sel.choice[v.id] === o.v;
+          return { l: o.l, on, off: !on, onClick: () => setSel((sel) => { sel.choice[v.id] = o.v; }) };
+        }),
+      })),
+      addins: r.variations.filter((v) => v.kind === 'add').map((v, k) => {
+        const on = !!st.sel.add[v.id];
+        const ing = r.ingredients.find((i) => i.id === v.ing);
+        return {
+          label: v.label, d: v.d, on, off: !on, ariaChecked: on ? 'true' : 'false', notFirst: k > 0,
+          amount: '+ ' + S.fmtQty(ing.q * st.servings / r.base, ing.u),
+          onClick: () => setSel((sel) => { sel.add[v.id] = !sel.add[v.id]; }),
+        };
+      }),
+      ingredients: res.ingredients.map((i) => ({ name: i.name, note: i.note, hasNote: !!i.note, amount: i.amount, variation: i.variation && r.variations.length > 0 && !(i.if || '').includes('!') && r.variations.some((v) => v.kind === 'add' ? i.if === 'add:' + v.id : v.def !== st.sel.choice[v.id] && i.if === v.id + '=' + st.sel.choice[v.id]) })),
+      ingCaption: `${res.ingredients.length} items · ${st.servings} servings`,
+      addToList: () => this.addToList(), isAdded, notAdded: !isAdded,
+      hasToast: !!st.toast && isAdded, toastText: st.toast,
+      viewList: () => this.go({ screen: 'shopping' }),
+      methods: r.methods.map((m) => ({
+        label: m.label, q: m.q,
+        options: m.options.map((o) => {
+          const on = st.sel.choice[m.id] === o.v;
+          return {
+            l: o.l, d: o.d, time: o.time, icon: o.icon, ariaChecked: on ? 'true' : 'false',
+            pad: on ? '11px 13px' : '12px 14px',
+            border: on ? 'var(--border-width-strong) solid var(--border-accent)' : 'var(--border-width) solid var(--border-default)',
+            onClick: () => setSel((sel) => { sel.choice[m.id] = o.v; }),
+          };
+        }),
+      })),
+      selSummary: this.summary(r, st.servings, st.sel),
+    });
+    const prep = res.steps.filter((s) => s.ph === 'prep');
+    const cook = res.steps.filter((s) => s.ph === 'cook');
+    vals.planText = `${prep.length} preparation steps, then ${cook.length} cooking steps.`;
+
+    // Cooking
+    const doneCount = res.steps.filter((s) => st.done[s.id]).length;
+    const active = res.steps.find((s) => !st.done[s.id]);
+    const mark = (id, v) => this.setState((s) => ({ done: { ...s.done, [id]: v } }));
+    const stepVals = (s) => {
+      const isDone = !!st.done[s.id], isActive = active && active.id === s.id;
+      return {
+        id: s.id, label: s.label, title: s.t, duration: s.d, isDone, isOpen: !isDone, isActive, notActive: !isActive,
+        pad: isActive ? '19px' : '20px',
+        border: isActive ? 'var(--border-width-strong) solid var(--border-accent)' : 'var(--border-width) solid var(--border-subtle)',
+        eyebrowColor: isActive ? 'var(--text-accent)' : 'var(--text-tertiary)',
+        warnings: s.needs.filter((n) => !st.done[n.id]).map((n) => ({ label: n.label, title: n.t, onJump: () => this.jumpTo(n.id) })),
+        ready: s.needs.filter((n) => st.done[n.id]).map((n) => ({ label: n.label, title: n.t })),
+        segs: s.segs.map((g) => g.ing
+          ? { isIng: true, isText: false, t: g.t, name: g.ing.name, amount: g.ing.amount, note: g.ing.note, tips: g.ing.tips }
+          : { isIng: false, isText: true, t: g.t }),
+        onDone: () => mark(s.id, true), onUndo: () => mark(s.id, false),
+      };
+    };
+    Object.assign(vals, {
+      allDone: doneCount === res.steps.length,
+      progressText: `${doneCount} of ${res.steps.length} steps done`,
+      progressPct: Math.round((doneCount / res.steps.length) * 100) + '%',
+      phases: [
+        { title: 'Preparation', caption: 'Get everything ready before you turn on the heat.', steps: prep.map(stepVals) },
+        { title: 'Cooking', caption: 'Steps marked with a warning need a preparation step first.', steps: cook.map(stepVals) },
+      ],
+    });
+    return vals;
+  }
+}
+</script>
+</body>
+</html>

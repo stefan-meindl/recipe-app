@@ -1,0 +1,38 @@
+/* Typography — Instrument Serif (display) · Inter (UI prose) · JetBrains Mono (code).
+   Each style ships as a font shorthand (use with `font:`) plus a tracking token. */
+:root {
+  --font-display: 'Instrument Serif', 'Times New Roman', Georgia, serif;
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+
+  --type-hero-display: 400 84px/1.05 var(--font-display);
+  --tracking-hero-display: -1.5px;
+  --hero-display-fluid-size: clamp(40px, calc(4px + 6.25vw), 84px);
+  --type-display-lg: 400 64px/1.10 var(--font-display);
+  --tracking-display-lg: -1px;
+  --type-heading-1: 400 52px/1.15 var(--font-display);
+  --tracking-heading-1: -0.5px;
+  --type-stat-display: 400 56px/1.10 var(--font-display);
+  --tracking-stat-display: -1px;
+  --type-heading-2: 500 36px/1.20 var(--font-sans);
+  --tracking-heading-2: -0.5px;
+  --type-heading-3: 500 28px/1.25 var(--font-sans);
+  --type-heading-4: 500 22px/1.30 var(--font-sans);
+  --type-heading-5: 500 18px/1.40 var(--font-sans);
+  --type-subtitle: 400 18px/1.50 var(--font-sans);
+  --type-body-md: 400 16px/1.55 var(--font-sans);
+  --type-body-md-medium: 500 16px/1.55 var(--font-sans);
+  --type-body-sm: 400 14px/1.50 var(--font-sans);
+  --type-body-sm-medium: 500 14px/1.50 var(--font-sans);
+  --type-caption: 400 13px/1.40 var(--font-sans);
+  --type-caption-bold: 600 13px/1.40 var(--font-sans);
+  --type-micro: 500 12px/1.40 var(--font-sans);
+  --type-micro-uppercase: 600 11px/1.40 var(--font-sans);
+  --tracking-micro-uppercase: 1px;
+  --type-button-md: 500 14px/1.30 var(--font-sans);
+  --type-code-md: 400 14px/1.50 var(--font-mono);
+}

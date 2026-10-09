@@ -1,0 +1,26 @@
+/* Elevation — light theme uses the source shadow ladder.
+   On OLED black, shadows are invisible: dark theme drops them and expresses depth with outline contrast
+   (--border-subtle → --border-default → --border-strong). */
+:root {
+  --shadow-0: none;
+  --shadow-1: rgba(0, 0, 0, 0.04) 0px 1px 2px 0px;
+  --shadow-2: rgba(0, 0, 0, 0.04) 0px 4px 12px 0px;
+  --shadow-3: rgba(0, 0, 0, 0.08) 0px 12px 24px -4px;
+  --shadow-4: rgba(0, 0, 0, 0.12) 0px 16px 48px -8px;
+}
+
+[data-theme="dark"] {
+  --shadow-0: none;
+  --shadow-1: none;
+  --shadow-2: none;
+  --shadow-3: none;
+  --shadow-4: none;
+}
+
+[data-theme="light"] {
+  --shadow-0: none;
+  --shadow-1: rgba(0, 0, 0, 0.04) 0px 1px 2px 0px;
+  --shadow-2: rgba(0, 0, 0, 0.04) 0px 4px 12px 0px;
+  --shadow-3: rgba(0, 0, 0, 0.08) 0px 12px 24px -4px;
+  --shadow-4: rgba(0, 0, 0, 0.12) 0px 16px 48px -8px;
+}

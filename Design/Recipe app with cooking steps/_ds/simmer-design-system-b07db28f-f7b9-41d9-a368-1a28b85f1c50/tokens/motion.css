@@ -1,0 +1,7 @@
+/* Motion — the source leaves timings open and recommends 150–200ms ease. No hover choreography (no-hover policy). */
+:root {
+  --duration-fast: 150ms; /* @kind other */
+  --duration-base: 200ms; /* @kind other */
+  --ease-standard: ease; /* @kind other */
+  --ease-out: cubic-bezier(0.2, 0, 0, 1); /* @kind other */
+}
