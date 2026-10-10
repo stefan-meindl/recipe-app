@@ -37,3 +37,5 @@ workshop/
 
 # Keep run configurations in version control
 !.idea/runConfigurations/
+# Working docs and plans
+plans/

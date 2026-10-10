@@ -1,0 +1,111 @@
+{
+  "id": "chilli",
+  "title": "Chilli con carne",
+  "category": "Mains",
+  "tags": ["Spicy", "One-pot", "Make-ahead"],
+  "time": 90,
+  "difficulty": "Easy",
+  "base": 4,
+  "icon": "flame",
+  "summary": "A slow-simmered chilli with kidney beans and smoked paprika, served over rice.",
+  "variations": [
+    {
+      "id": "mince",
+      "kind": "swap",
+      "label": "Mince",
+      "options": [
+        { "v": "beef", "l": "Beef" },
+        { "v": "plant", "l": "Plant-based" }
+      ],
+      "def": "beef"
+    },
+    {
+      "id": "choc",
+      "kind": "add",
+      "label": "Dark chocolate",
+      "d": "Adds depth and rounds off the heat.",
+      "ing": "dc"
+    },
+    {
+      "id": "beer",
+      "kind": "add",
+      "label": "Dark beer",
+      "d": "Replaces half the stock for a malty sauce.",
+      "ing": "be"
+    },
+    {
+      "id": "cin",
+      "kind": "add",
+      "label": "Cinnamon",
+      "d": "A warm note in the background.",
+      "ing": "cn"
+    }
+  ],
+  "methods": [
+    {
+      "id": "chilli",
+      "label": "The chilli",
+      "q": "How do you want to simmer the chilli?",
+      "options": [
+        { "v": "pot", "l": "Pot on the hob", "icon": "flame", "time": "1 h", "d": "Simmer gently, stirring now and then." },
+        { "v": "oven", "l": "In the oven", "icon": "layers", "time": "2 h", "d": "Covered at 150C. Richer, no stirring." },
+        { "v": "slow", "l": "Slow cooker", "icon": "timer", "time": "6 h", "d": "Brown first, then leave it on low." }
+      ]
+    },
+    {
+      "id": "rice",
+      "label": "Rice",
+      "q": "How do you want to cook the rice?",
+      "options": [
+        { "v": "pot", "l": "In a pot", "icon": "flame", "time": "18 min", "d": "Absorption method on the hob." },
+        { "v": "microwave", "l": "Microwave", "icon": "zap", "time": "12 min", "d": "Hands-off, no pot to wash." },
+        { "v": "cooker", "l": "Rice cooker", "icon": "timer", "time": "30 min", "d": "Switch it on and forget it." }
+      ]
+    }
+  ],
+  "ingredients": [
+    { "id": "oi", "name": "Olive oil", "q": 2, "u": "tbsp", "aisle": "Pantry" },
+    { "id": "on", "name": "Onions", "q": 2, "u": "", "note": "finely chopped", "aisle": "Produce", "tips": ["Chill them for 10 minutes before chopping to cut down on tears."] },
+    { "id": "pe", "name": "Red pepper", "q": 1, "u": "", "note": "diced", "aisle": "Produce" },
+    { "id": "ga", "name": "Garlic", "q": 3, "u": ["clove", "cloves"], "note": "crushed", "aisle": "Produce", "tips": ["Crush with the flat of a knife and a pinch of salt."] },
+    { "id": "mb", "name": "Beef mince", "q": 500, "u": "g", "if": "mince=beef", "aisle": "Meat", "tips": ["15-20% fat keeps it juicy; leaner mince dries out.", "Brown it in batches if your pot is small."] },
+    { "id": "mp", "name": "Plant-based mince", "q": 400, "u": "g", "if": "mince=plant", "aisle": "Chilled", "tips": ["It browns faster than beef. Keep the heat at medium."] },
+    { "id": "cu", "name": "Ground cumin", "q": 2, "u": "tsp", "aisle": "Spices" },
+    { "id": "pa", "name": "Smoked paprika", "q": 1, "u": "tsp", "aisle": "Spices" },
+    { "id": "ch", "name": "Chilli flakes", "q": 1, "u": "tsp", "aisle": "Spices", "tips": ["Start with half and add more at the end."] },
+    { "id": "or", "name": "Dried oregano", "q": 1, "u": "tsp", "aisle": "Spices" },
+    { "id": "cn", "name": "Ground cinnamon", "q": 0.5, "u": "tsp", "if": "add:cin", "aisle": "Spices", "tips": ["A little goes a long way. You should barely taste it."] },
+    { "id": "tp", "name": "Tomato puree", "q": 2, "u": "tbsp", "aisle": "Tins and jars" },
+    { "id": "to", "name": "Chopped tomatoes", "q": 800, "u": "g", "note": "2 tins", "aisle": "Tins and jars" },
+    { "id": "kb", "name": "Kidney beans", "q": 400, "u": "g", "note": "1 tin", "aisle": "Tins and jars" },
+    { "id": "st", "name": "Stock", "q": 300, "u": "ml", "alt": [["add:beer", 150]], "aisle": "Pantry" },
+    { "id": "be", "name": "Dark beer", "q": 200, "u": "ml", "if": "add:beer", "aisle": "Drinks", "tips": ["A stout or porter works best.", "Let it bubble for a few minutes to cook off the alcohol."] },
+    { "id": "dc", "name": "Dark chocolate", "q": 20, "u": "g", "note": "70% cocoa", "if": "add:choc", "aisle": "Baking", "tips": ["Use 70% cocoa or higher; milk chocolate makes it sweet."] },
+    { "id": "ri", "name": "Long-grain rice", "q": 300, "u": "g", "aisle": "Pantry", "tips": ["Rinsing removes surface starch so the grains stay separate."] },
+    { "id": "wa", "name": "Water", "q": 450, "u": "ml", "alt": [["rice=microwave", 600]], "note": "for the rice" },
+    { "id": "cr", "name": "Soured cream", "q": 150, "u": "ml", "note": "to serve", "aisle": "Dairy" },
+    { "id": "co", "name": "Coriander", "q": 1, "u": ["bunch", "bunches"], "note": "to serve", "aisle": "Produce" }
+  ],
+  "steps": [
+    { "id": "p-veg", "ph": "prep", "t": "Chop the vegetables", "d": 600, "b": "Finely chop the {on:onions}, dice the {pe:red pepper} and crush the {ga:garlic}. Keep them in separate piles." },
+    { "id": "p-spice", "ph": "prep", "if": "!add:cin", "t": "Mix the spices", "d": 120, "b": "Stir the {cu:cumin}, {pa:smoked paprika}, {ch:chilli flakes} and {or:oregano} together in a small bowl." },
+    { "id": "p-spice", "ph": "prep", "if": "add:cin", "t": "Mix the spices", "d": 120, "b": "Stir the {cu:cumin}, {pa:smoked paprika}, {ch:chilli flakes}, {or:oregano} and {cn:cinnamon} together in a small bowl." },
+    { "id": "p-beans", "ph": "prep", "t": "Drain the beans", "d": 60, "b": "Tip the {kb:kidney beans} into a sieve and rinse under cold water." },
+    { "id": "p-choc", "ph": "prep", "if": "add:choc", "t": "Chop the chocolate", "d": 60, "b": "Roughly chop the {dc:dark chocolate} so it melts evenly later." },
+    { "id": "p-rice", "ph": "prep", "t": "Rinse the rice", "d": 120, "b": "Rinse the {ri:rice} in a sieve until the water runs clear, then leave it to drain." },
+    { "id": "c-soft", "ph": "cook", "t": "Soften the onions", "d": 480, "needs": ["p-veg"], "b": "Heat the {oi:olive oil} in a large pot over a medium heat. Add the {on:onions} and {pe:pepper} and cook until soft. Add the {ga:garlic} for the last minute." },
+    { "id": "c-brown", "ph": "cook", "if": "mince=beef", "t": "Brown the mince", "d": 480, "b": "Turn up the heat, add the {mb:beef mince} and break it up with a spoon until browned all over." },
+    { "id": "c-brown", "ph": "cook", "if": "mince=plant", "t": "Brown the mince", "d": 300, "b": "Add the {mp:plant-based mince} and break it up with a spoon until lightly browned." },
+    { "id": "c-spice", "ph": "cook", "t": "Toast the spices", "d": 60, "needs": ["p-spice"], "b": "Stir in the spice mix and the {tp:tomato puree}. Cook for a minute until fragrant." },
+    { "id": "c-liquid", "ph": "cook", "if": "!add:beer", "t": "Add the liquids", "d": 120, "needs": ["p-beans"], "b": "Pour in the {to:chopped tomatoes} and {st:stock}, then add the {kb:kidney beans}. Stir and bring to a simmer." },
+    { "id": "c-liquid", "ph": "cook", "if": "add:beer", "t": "Add the liquids", "d": 240, "needs": ["p-beans"], "b": "Pour in the {be:dark beer} and let it bubble for 2 minutes. Add the {to:chopped tomatoes}, {st:stock} and {kb:kidney beans}, then bring to a simmer." },
+    { "id": "c-sim", "ph": "cook", "if": "chilli=pot", "t": "Simmer the chilli", "d": 3600, "b": "Partly cover and simmer gently for an hour, stirring now and then. Add a splash of water if it gets too thick." },
+    { "id": "c-sim", "ph": "cook", "if": "chilli=oven", "t": "Braise in the oven", "d": 7200, "b": "Cover the pot with a lid and move it to the oven at 150C. Stir once halfway through." },
+    { "id": "c-sim", "ph": "cook", "if": "chilli=slow", "t": "Slow cook", "d": 21600, "b": "Transfer everything to the slow cooker, cover and cook on low for 6 hours." },
+    { "id": "r-pot", "ph": "cook", "if": "rice=pot", "t": "Cook the rice", "d": 1080, "needs": ["p-rice"], "b": "Put the {ri:rice} in a pot with the {wa:water} and a pinch of salt. Bring to the boil, cover and cook on the lowest heat for 12 minutes, then leave to rest off the heat for 6." },
+    { "id": "r-mw", "ph": "cook", "if": "rice=microwave", "t": "Microwave the rice", "d": 720, "needs": ["p-rice"], "b": "Put the {ri:rice} and {wa:water} in a large microwave-safe bowl. Cover loosely and cook on full power for 10 minutes, then let it stand for 2." },
+    { "id": "r-rc", "ph": "cook", "if": "rice=cooker", "t": "Start the rice cooker", "d": 1800, "needs": ["p-rice"], "b": "Add the {ri:rice} and {wa:water} to the rice cooker, close the lid and switch it on. It keeps warm until you serve." },
+    { "id": "c-fin", "ph": "cook", "if": "add:choc", "t": "Finish and serve", "d": 120, "needs": ["p-choc"], "b": "Stir the {dc:chocolate} into the chilli until melted. Taste, season with salt and serve over the rice with {cr:soured cream} and {co:coriander}." },
+    { "id": "c-fin", "ph": "cook", "if": "!add:choc", "t": "Season and serve", "d": 60, "needs": ["p-choc"], "b": "Taste and season with salt. Serve over the rice with {cr:soured cream} and {co:coriander}." }
+  ]
+}
