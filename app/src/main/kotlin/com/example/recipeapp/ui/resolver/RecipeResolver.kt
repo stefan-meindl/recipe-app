@@ -1,95 +1,239 @@
 package com.example.recipeapp.ui.resolver
 
-import com.example.recipeapp.model.Ingredient
-import com.example.recipeapp.model.PreparationMethod
-import com.example.recipeapp.model.Recipe
-import com.example.recipeapp.model.Step
+import com.example.recipeapp.model.AltCondition
+import com.example.recipeapp.model.IngredientVariant
+import com.example.recipeapp.model.RecipeV2
+import com.example.recipeapp.model.StepV2
+import com.example.recipeapp.model.StepPhase
+import java.math.BigDecimal
+import java.math.MathContext
 
 /**
- * Pure, framework-free recipe resolver.
+ * Resolves a [RecipeV2] into a display-ready form.
  *
- * Given a [Recipe] and a selection request ([selection]), it returns the exact
- * ingredients and steps to display for that selection, with ingredient quantities
- * scaled to the requested servings. Being pure (no Android, no DI, no state) makes
- * it trivially unit-testable and reusable from the ViewModel or a future deep-link.
+ * Resolution pipeline:
+ * 1. **validate()** — check servings, ingredient IDs, required fields
+ * 2. **parseConditions()** — parse condition strings into [Condition] instances
+ * 3. **scaleIngredients()** — scale quantities by servings ratio
+ * 4. **applyAltOverrides()** — apply per-condition quantity overrides
+ * 5. **filterSteps()** — remove steps whose conditions don't match
+ * 6. **orderSteps()** — topological sort on `needs[]` edges, partition into prep/cook
+ * 7. **buildResult()** — assemble [ResolutionResult] with warnings/errors
+ *
+ * All validation errors are collected into [ResolutionResult.errors] rather than throwing.
+ * Unparseable conditions produce warnings rather than crashes.
  */
 object RecipeResolver {
 
-    /** A request to resolve a specific recipe to a specific preparation method. */
-    data class Selection(
-        val recipeId: String,
-        val methodId: String? = null,
-        val servings: Int? = null,
-    )
-
-    /** The resolved, ready-to-display output for a selection. */
-    data class Resolution(
-        val recipe: Recipe,
-        val method: PreparationMethod,
-        val servings: Int,
-        val multiplier: Double,
-        val ingredients: List<Ingredient>,
-        val steps: List<Step>,
-    )
-
     /**
-     * Resolve [recipe] to the requested [selection].
+     * Resolve a recipe for display.
      *
-     * @throws IllegalArgumentException if the recipeId is unknown, the requested
-     *   methodId does not exist on the recipe, or servings would be below 1.
+     * @param recipe The recipe to resolve
+     * @param servings Desired serving count (must be >= 1, otherwise error is collected)
+     * @param context Variation selections (e.g. "diet" → "vegan") used for condition evaluation
+     * @return A [ResolutionResult] containing the resolved recipe, warnings, and errors
      */
-    fun resolve(recipe: Recipe, selection: Selection): Resolution {
-        require(recipe.id == selection.recipeId) {
-            "Selection recipeId '${selection.recipeId}' does not match recipe id '${recipe.id}'"
+    fun resolve(
+        recipe: RecipeV2,
+        servings: Int = recipe.servings,
+        context: Map<String, Any> = emptyMap(),
+    ): ResolutionResult {
+        val warnings = mutableListOf<String>()
+        val errors = mutableListOf<String>()
+
+        // Step 1: Validate
+        val validationErrors = validate(recipe, servings)
+        errors.addAll(validationErrors.map { it.message })
+
+        // If validation fails fatally (e.g. no methods, invalid servings), return early with failure
+        if (errors.any { it.contains("Servings must be at least 1") } || errors.any { it.contains("no methods") }) {
+            return ResolutionResult.failure(errors, requestedServings = servings)
         }
 
         val baseServings = recipe.servings.coerceAtLeast(1)
-        val requested = selection.servings ?: baseServings
-        val servings = requested
-        require(servings >= 1) { "Servings must be at least 1, was $servings" }
+        val effectiveServings = if (servings >= 1) servings else baseServings
 
-        val method: PreparationMethod = if (selection.methodId != null) {
-            recipe.preparationMethods.firstOrNull { it.id == selection.methodId }
-                ?: throw IllegalArgumentException(
-                    "No preparation method found for id '${selection.methodId}' on recipe '${recipe.id}'"
-                )
-        } else {
-            recipe.preparationMethods.firstOrNull()
-                ?: throw IllegalArgumentException(
-                    "Recipe '${recipe.id}' has no preparation methods"
-                )
+        // Step 2: Parse conditions for ingredients and steps
+        val parsedIngredientConditions = recipe.ingredients.map { ing ->
+            ing.condition?.let { cond ->
+                val parsed = ConditionParser.parse(cond)
+                if (parsed is Condition.UnparseableCondition) {
+                    warnings.add("Unparseable ingredient condition for '${ing.id}': '$cond'")
+                }
+                parsed
+            }
         }
 
-        val multiplier = servings.toDouble() / baseServings.toDouble()
+        val parsedStepConditions = recipe.steps.map { step ->
+            step.condition?.let { cond ->
+                val parsed = ConditionParser.parse(cond)
+                if (parsed is Condition.UnparseableCondition) {
+                    warnings.add("Unparseable step condition for '${step.id}': '$cond'")
+                }
+                parsed
+            }
+        }
 
-        val ingredients = method.ingredients.map { it.scaledBy(multiplier) }
-        val steps = method.steps
+        // Step 3-4: Scale ingredients and apply alt overrides
+        val resolvedIngredients = buildList {
+            for ((index, ing) in recipe.ingredients.withIndex()) {
+                val condition = parsedIngredientConditions[index]
+                if (condition != null && !condition.evaluate(context)) {
+                    continue // Skip ingredient whose condition doesn't match
+                }
 
-        return Resolution(
-            recipe = recipe,
-            method = method,
-            servings = servings,
-            multiplier = multiplier,
-            ingredients = ingredients,
-            steps = steps,
+                var scaledQty = ing.qty?.let { QuantityScaler.scaleNumeric(it, baseServings, effectiveServings) }
+                var result = ing.copy(qty = scaledQty)
+
+                // Apply alt overrides
+                for (alt in ing.alt) {
+                    val altCondition = ConditionParser.parse(alt.condition)
+                    if (altCondition.evaluate(context)) {
+                        val altValue = alt.value
+                        result = result.copy(qty = QuantityScaler.scaleNumeric(altValue, baseServings, effectiveServings))
+                    }
+                }
+
+                add(result)
+            }
+        }
+
+        // Step 5: Filter steps by condition
+        val filteredSteps = buildList {
+            for ((index, step) in recipe.steps.withIndex()) {
+                val condition = parsedStepConditions[index]
+                if (condition != null && !condition.evaluate(context)) {
+                    continue // Skip step whose condition doesn't match
+                }
+                add(step)
+            }
+        }
+
+        // Step 6: Order steps (topological sort + partition)
+        val orderedSteps = orderSteps(filteredSteps, warnings)
+
+        // Step 7: Build result
+        val resolvedRecipe = recipe.copy(
+            ingredients = resolvedIngredients,
+            steps = orderedSteps,
         )
+
+        return if (errors.isEmpty()) {
+            if (warnings.isNotEmpty()) {
+                ResolutionResult.partial(resolvedRecipe, warnings, requestedServings = servings)
+            } else {
+                ResolutionResult.success(resolvedRecipe, requestedServings = servings)
+            }
+        } else {
+            ResolutionResult(resolved = resolvedRecipe, requestedServings = servings, warnings = warnings, errors = errors)
+        }
     }
 
     /**
-     * Convenience overload that resolves a recipe directly.
-     * @param methodId optional; defaults to the recipe's first method.
-     * @param servings optional; defaults to the recipe's default servings.
+     * Validate recipe inputs. Returns a list of validation errors.
      */
-    fun resolve(
-        recipe: Recipe,
-        methodId: String? = null,
-        servings: Int? = null,
-    ): Resolution = resolve(recipe, Selection(recipe.id, methodId, servings))
+    private fun validate(recipe: RecipeV2, servings: Int): List<ValidationError> {
+        val errors = mutableListOf<ValidationError>()
+
+        if (servings < 1) {
+            errors.add(ValidationError("Servings must be at least 1, was $servings"))
+        }
+
+        val stepIds = recipe.steps.map { it.id }.toSet()
+        val ingredientIds = recipe.ingredients.map { it.id }.toSet()
+
+        // Check that all needs[] IDs exist as either step IDs or ingredient IDs
+        for (step in recipe.steps) {
+            for (neededId in step.needs) {
+                if (neededId !in stepIds && neededId !in ingredientIds) {
+                    errors.add(ValidationError("Step '${step.id}' references unknown ingredient ID '$neededId'"))
+                }
+            }
+        }
+
+        // Check required fields
+        if (recipe.methods.isEmpty()) {
+            errors.add(ValidationError("Recipe '${recipe.id}' has no methods"))
+        }
+
+        return errors
+    }
 
     /**
-     * Find a recipe by id in a collection.
-     * @return the matching recipe, or null if none match.
+     * Topologically sort steps by their `needs[]` dependencies using Kahn's algorithm.
+     *
+     * Steps are partitioned into prep and cook phases. Prep steps always come before cook steps.
+     * Within each phase, steps are ordered by their dependencies.
+     *
+     * If a cycle is detected, a structured warning is added and the best-effort
+     * sorted steps are returned.
+     *
+     * @param steps The filtered steps to order
+     * @param warnings Mutable list to append cycle detection warnings to
+     * @return The topologically sorted steps
      */
-    fun findRecipe(recipes: List<Recipe>, recipeId: String): Recipe? =
-        recipes.firstOrNull { it.id == recipeId }
+    private fun orderSteps(
+        steps: List<StepV2>,
+        warnings: MutableList<String>,
+    ): List<StepV2> {
+        if (steps.isEmpty()) return emptyList()
+
+        // Build adjacency list: step → steps that depend on it
+        val stepIds = steps.map { it.id }.toSet()
+        val dependents = mutableMapOf<String, MutableSet<String>>()
+        val inDegree = mutableMapOf<String, Int>()
+
+        for (step in steps) {
+            dependents[step.id] = mutableSetOf()
+            inDegree[step.id] = 0
+        }
+
+        for (step in steps) {
+            for (needId in step.needs) {
+                if (needId in stepIds) {
+                    dependents.getOrPut(needId) { mutableSetOf() }.add(step.id)
+                    inDegree[step.id] = inDegree.getValue(step.id) + 1
+                }
+                // Need references an ingredient or unknown step — ignore for ordering
+            }
+        }
+
+        // Kahn's algorithm — use a sorted list for deterministic ordering
+        val queue = steps.filter { inDegree.getValue(it.id) == 0 }.map { it.id }.toMutableList()
+        queue.sort()
+        val sorted = mutableListOf<String>()
+
+        while (queue.isNotEmpty()) {
+            val node = queue.removeAt(0)
+            sorted.add(node)
+
+            for (dependent in dependents[node] ?: emptySet()) {
+                inDegree[dependent] = inDegree.getValue(dependent) - 1
+                if (inDegree.getValue(dependent) == 0) {
+                    queue.add(dependent)
+                    queue.sort()
+                }
+            }
+        }
+
+        // Check for cycles
+        if (sorted.size < steps.size) {
+            val cyclicSteps = steps.filter { it.id !in sorted }.map { it.id }
+            warnings.add("Cycle detected in step dependencies: ${cyclicSteps.joinToString(", ")}")
+            val cyclicStepsList = steps.filter { it.id !in sorted }
+            return steps.filter { it.id in sorted } + cyclicStepsList
+        }
+
+        // Partition into prep and cook, preserving topological order within each phase
+        val prepSteps = steps.filter { it.phase == StepPhase.prep }
+        val cookSteps = steps.filter { it.phase == StepPhase.cook }
+
+        val sortedPrep = prepSteps.sortedBy { sorted.indexOf(it.id) }
+        val sortedCook = cookSteps.sortedBy { sorted.indexOf(it.id) }
+
+        return sortedPrep + sortedCook
+    }
+
+    /** Represents a validation failure. */
+    private data class ValidationError(val message: String)
 }
