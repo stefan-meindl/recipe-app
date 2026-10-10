@@ -83,7 +83,12 @@ fun scaleQuantity(quantity: String, multiplier: Double): String {
         val number = match.groupValues[1].toDoubleOrNull() ?: 1.0
         val unit = match.groupValues[2].trim()
         val scaled = (number * multiplier).let {
-            if (it == it.toLong().toDouble()) it.toLong().toString() else String.format("%.2g", it)
+            if (it == it.toLong().toDouble()) it.toLong().toString()
+            else {
+                val formatted = String.format(java.util.Locale.US, "%.2f", it)
+                val trimmed = formatted.trimEnd('0').trimEnd('.')
+                if (trimmed.isEmpty() || trimmed == "-0") "0" else trimmed
+            }
         }
         if (unit.isNotEmpty()) "$scaled $unit" else scaled
     } else {

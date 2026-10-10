@@ -106,6 +106,22 @@ class RecipeSerializationTest {
     }
 
     @Test
+    fun scaleIngredientToNonIntegerFractionalValue() {
+        // Regression: scaled quantity must not render in scientific notation
+        // (e.g. 150 g * 1.25 = 187.5 g, not "1.9e+02 g").
+        val ingredient = Ingredient("Cheddar cheese", "150 g")
+        val scaled = ingredient.scaledBy(1.25)
+        assertEquals("187.5 g", scaled.quantity)
+    }
+
+    @Test
+    fun scaleIngredientToIntegerValue() {
+        val ingredient = Ingredient("Cheddar cheese", "150 g")
+        val scaled = ingredient.scaledBy(2.0)
+        assertEquals("300 g", scaled.quantity)
+    }
+
+    @Test
     fun deserializeIgnoresUnknownKeys() {
         val jsonStr = """
         {
