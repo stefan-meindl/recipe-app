@@ -3,7 +3,6 @@ package com.example.recipeapp.ui.recipe
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.recipeapp.data.RecipeRepository
-import com.example.recipeapp.model.Ingredient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,7 +26,7 @@ data class ShoppingListItemData(
 
 class ShoppingListFlowViewModel(
     private val repository: RecipeRepository,
-    private val recipeFlowState: MutableStateFlow<RecipeFlowState?>,
+    private val onSave: ((Int, String?, String?) -> Unit)?,
     private val recipeId: String,
     private val servings: Int,
     private val variantId: String?,
@@ -75,19 +74,9 @@ class ShoppingListFlowViewModel(
         }
     }
 
-    /** Called on back press or save — bridges updated state back to RecipeFlowState. */
+    /** Called on back press or save — bridges updated state back to parent. */
     fun onSave(newServings: Int, newVariantId: String?, newMethodId: String?) {
         _uiState.update { it.copy(servings = newServings) }
-        recipeFlowState.update { state ->
-            state?.copy(
-                servings = newServings,
-                selectedVariant = state.selectedVariant?.let {
-                    if (it.id == newVariantId) it else state.selectedVariant
-                },
-                selectedMethod = state.selectedMethod?.let {
-                    if (it.id == newMethodId) it else state.selectedMethod
-                },
-            )
-        }
+        onSave?.invoke(newServings, newVariantId, newMethodId)
     }
 }

@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -16,9 +15,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -38,9 +34,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -58,7 +51,6 @@ import com.example.recipeapp.model.Recipe
 import com.example.recipeapp.model.Step
 import com.example.recipeapp.ui.components.CookingStep
 import com.example.recipeapp.ui.components.IngredientChip
-import com.example.recipeapp.ui.components.SegmentedTabs
 import com.example.recipeapp.ui.components.ShoppingListItem
 import com.example.recipeapp.ui.components.SimmerBadge
 import com.example.recipeapp.ui.components.SimmerBadgeVariant
@@ -67,7 +59,6 @@ import com.example.recipeapp.ui.components.SimmerButtonVariant
 import com.example.recipeapp.ui.components.SimmerCard
 import com.example.recipeapp.ui.components.SimmerCardVariant
 import com.example.recipeapp.ui.components.SimmerIcon
-import com.example.recipeapp.ui.components.SimmerTabItem
 import com.example.recipeapp.ui.theme.Simmer
 import com.example.recipeapp.ui.theme.SimmerSpace
 import com.example.recipeapp.ui.theme.SimmerType
@@ -76,15 +67,15 @@ import com.example.recipeapp.ui.theme.SimmerType
 @Composable
 fun RecipeFlowScreen(
     recipeId: String,
-    onNavigateToShoppingList: (recipeId: String, servings: Int, variantId: String?, methodId: String?) -> Unit,
+    viewModel: RecipeFlowViewModel,
+    onNavigateToShoppingList: (String, Int, String?, String?) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val viewModel: RecipeFlowViewModel = androidx.lifecycle.viewmodel.compose.hiltViewModel()
-    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
     val c = Simmer.colors
 
-    BackHandler(enabled = state != null) { onBack() }
+    BackHandler(enabled = uiState.value != null) { onBack() }
 
     Scaffold(
         containerColor = c.surfacePage,
@@ -92,7 +83,7 @@ fun RecipeFlowScreen(
             TopAppBar(
                 title = {
                     Text(
-                        state?.recipe?.title ?: "Recipe",
+                        uiState.value?.recipe?.title ?: "Recipe",
                         style = MaterialTheme.typography.headlineSmall,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -110,7 +101,7 @@ fun RecipeFlowScreen(
             )
         },
         content = { padding ->
-            state?.let { recipeState ->
+            uiState.value?.let { recipeState ->
                 Column(
                     modifier = modifier
                         .fillMaxSize()
@@ -128,10 +119,10 @@ fun RecipeFlowScreen(
                             onMethodSelected = viewModel::onMethodSelected,
                             onNavigateToShoppingList = {
                                 onNavigateToShoppingList(
-                                    recipeId = recipeState.recipe.id,
-                                    servings = recipeState.effectiveServings,
-                                    variantId = recipeState.selectedVariant?.id,
-                                    methodId = recipeState.selectedMethod?.id,
+                                    recipeState.recipe.id,
+                                    recipeState.effectiveServings,
+                                    recipeState.selectedVariant?.id,
+                                    recipeState.selectedMethod?.id,
                                 )
                             },
                             onContinueToCooking = {
@@ -149,7 +140,7 @@ fun RecipeFlowScreen(
     )
 }
 
-/** Stage 1: Overview — grid of recipe cards (for single recipe, shows the recipe itself). */
+/** Stage 1: Overview — shows the recipe details. */
 @Composable
 private fun RecipeOverviewGrid(
     recipe: Recipe,
@@ -342,30 +333,6 @@ private fun RecipeCookingPanel(
     ) {
         Text(state.recipe.title, style = MaterialTheme.typography.headlineLarge, color = c.textPrimary)
 
-        // Pre-compute phase headings and step labels
-        val stepMeta = remember(state.steps) {
-            val counters = mutableMapOf<String, Int>()
-            var lastPhase = ""
-            state.steps.map { step ->
-                val phaseKey = step.phase.uppercase().ifBlank { "STEP" }
-                val phaseNum = (counters[phaseKey] ?: 0) + 1
-                counters[phaseKey] = phaseNum
-                val phaseHeading = if (step.phase != lastPhase) {
-                    lastPhase = step.phase
-                    when (step.phase) {
-                        "prep" -> "Preparation"
-                        "cook" -> "Cooking"
-                        else -> step.phase.replaceFirstChar { it.titlecase() }
-                    }
-                } else null
-                CookingStepData(
-                    step = step,
-                    phaseHeading = phaseHeading,
-                    stepLabel = "$phaseKey $phaseNum",
-                )
-            }
-        }
-
         // Prep steps
         if (state.prepSteps.isNotEmpty()) {
             Text("Preparation", style = MaterialTheme.typography.headlineMedium, color = c.textPrimary)
@@ -373,20 +340,20 @@ private fun RecipeCookingPanel(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(SimmerSpace.md),
             ) {
-                items(stepMeta.filter { it.step.phase.equals("prep", ignoreCase = true) }) { data ->
+                items(state.prepSteps) { step ->
                     CookingStep(
-                        title = data.step.title,
-                        stepLabel = data.stepLabel,
-                        durationSeconds = (data.step.durationMinutes ?: 0) * 60,
-                        stepId = data.step.id,
+                        title = step.title,
+                        stepLabel = "PREP",
+                        durationSeconds = (step.durationMinutes ?: 0) * 60,
+                        stepId = step.id,
                         active = false,
                         onTimerComplete = {},
                     ) {
-                        val segments = remember(data.step.description) {
-                            resolve(data.step.description, state.scaledIngredients)
+                        val segments = remember(step.description) {
+                            resolve(step.description, state.scaledIngredients)
                         }
                         StepBodyRenderer(segments)
-                        data.step.tips?.forEach { tip ->
+                        step.tips?.forEach { tip ->
                             Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.Top) {
                                 SimmerIcon(Icons.Outlined.Lightbulb, c.textAccent, size = 18.dp)
                                 Text(tip, style = MaterialTheme.typography.bodyMedium, color = c.textSecondary)
@@ -404,20 +371,20 @@ private fun RecipeCookingPanel(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(SimmerSpace.md),
             ) {
-                items(stepMeta.filter { it.step.phase.equals("cook", ignoreCase = true) }) { data ->
+                items(state.cookSteps) { step ->
                     CookingStep(
-                        title = data.step.title,
-                        stepLabel = data.stepLabel,
-                        durationSeconds = (data.step.durationMinutes ?: 0) * 60,
-                        stepId = data.step.id,
+                        title = step.title,
+                        stepLabel = "COOK",
+                        durationSeconds = (step.durationMinutes ?: 0) * 60,
+                        stepId = step.id,
                         active = false,
                         onTimerComplete = {},
                     ) {
-                        val segments = remember(data.step.description) {
-                            resolve(data.step.description, state.scaledIngredients)
+                        val segments = remember(step.description) {
+                            resolve(step.description, state.scaledIngredients)
                         }
                         StepBodyRenderer(segments)
-                        data.step.tips?.forEach { tip ->
+                        step.tips?.forEach { tip ->
                             Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.Top) {
                                 SimmerIcon(Icons.Outlined.Lightbulb, c.textAccent, size = 18.dp)
                                 Text(tip, style = MaterialTheme.typography.bodyMedium, color = c.textSecondary)
