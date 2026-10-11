@@ -16,15 +16,6 @@ import androidx.compose.ui.unit.sp
 import com.example.recipeapp.ui.theme.Simmer
 
 /**
- * Formats seconds as mm:ss (zero-padded to 5 chars).
- */
-fun formatClock(seconds: Int): String {
-    val mins = seconds / 60
-    val secs = seconds % 60
-    return "${mins}:${secs.toString().padStart(2, '0')}"
-}
-
-/**
  * Compact timer display: mm:ss with a circular progress ring.
  * Recomposes on state change.
  */
