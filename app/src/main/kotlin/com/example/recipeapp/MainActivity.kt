@@ -5,11 +5,14 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.recipeapp.data.JsonRecipeRepository
-import com.example.recipeapp.ui.RecipesApp
-import com.example.recipeapp.ui.RecipesViewModelFactory
-import com.example.recipeapp.ui.RecipesViewModel
+import com.example.recipeapp.ui.recipe.RecipeNavGraph
 import com.example.recipeapp.ui.theme.SimmerTheme
 
 class MainActivity : ComponentActivity() {
@@ -18,9 +21,13 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             SimmerTheme(darkTheme = isSystemInDarkTheme()) {
-                val repository = JsonRecipeRepository(this)
-                val viewModel: RecipesViewModel = viewModel(factory = RecipesViewModelFactory(repository))
-                RecipesApp(viewModel)
+                val context = LocalContext.current
+                val repository = remember { JsonRecipeRepository(context) }
+                val navController = rememberNavController()
+                RecipeNavGraph(
+                    navController = navController,
+                    repository = repository,
+                )
             }
         }
     }

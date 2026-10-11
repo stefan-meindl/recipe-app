@@ -68,7 +68,10 @@ import com.example.recipeapp.ui.theme.SimmerType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecipesApp(viewModel: RecipesViewModel) {
+fun RecipesApp(
+    viewModel: RecipesViewModel,
+    onRecipeSelected: (String) -> Unit = {},
+) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val selected = state.selected
     val c = Simmer.colors
@@ -107,7 +110,7 @@ fun RecipesApp(viewModel: RecipesViewModel) {
                     .padding(padding),
             ) {
                 if (selected == null) {
-                    RecipeList(state, viewModel)
+                    RecipeList(state, viewModel, onRecipeSelected)
                 } else {
                     RecipeDetail(state, viewModel)
                 }
@@ -120,6 +123,7 @@ fun RecipesApp(viewModel: RecipesViewModel) {
 private fun RecipeList(
     state: RecipesUiState,
     viewModel: RecipesViewModel,
+    onRecipeSelected: (String) -> Unit,
 ) {
     if (state.loading) {
         Text("Loading...", Modifier.padding(SimmerSpace.lg))
