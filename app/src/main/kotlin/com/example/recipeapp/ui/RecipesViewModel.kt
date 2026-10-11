@@ -19,6 +19,7 @@ data class RecipesUiState(
     val selectedMethodIndex: Int = 0,
     val userServings: Int = 0, // 0 = use recipe's default servings
     val loading: Boolean = true,
+    val completedStepIds: Set<String> = emptySet(),
 ) {
     val effectiveServings: Int
         get() = if (userServings > 0) userServings else selected?.servings ?: 1
@@ -64,6 +65,7 @@ class RecipesViewModel(private val repository: RecipeRepository) : ViewModel() {
                 selected = recipe,
                 selectedMethodIndex = 0,
                 userServings = 0,
+                completedStepIds = emptySet(),
             )
         }
     }
@@ -92,6 +94,12 @@ class RecipesViewModel(private val repository: RecipeRepository) : ViewModel() {
         _uiState.update { state ->
             val current = state.effectiveServings
             state.copy(userServings = (current - 1).coerceAtLeast(1))
+        }
+    }
+
+    fun completeStep(stepId: String) {
+        _uiState.update { state ->
+            state.copy(completedStepIds = state.completedStepIds + stepId)
         }
     }
 }

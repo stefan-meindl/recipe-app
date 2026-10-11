@@ -71,14 +71,18 @@ fun formatIdle(totalSeconds: Int): String {
  * Orange tap-to-start timer. Idle -> Running -> Paused -> Running ... -> Done (tap to reset).
  * Filled orange while idle or running; outlined while paused; inverse fill when done.
  * State lives in memory only, so it resets if the composable leaves composition.
+ *
+ * @param stepId Unique identifier for the step this timer belongs to.
+ *               Passed to [onComplete] so callers can identify which step finished.
  */
 @Composable
 fun StepTimer(
     durationSeconds: Int,
+    stepId: String,
     modifier: Modifier = Modifier,
     label: String? = null,
     onStart: () -> Unit = {},
-    onComplete: () -> Unit = {},
+    onComplete: (String) -> Unit = {},
 ) {
     val c = Simmer.colors
     var status by remember { mutableStateOf(TimerStatus.Idle) }
@@ -93,7 +97,7 @@ fun StepTimer(
             if (left <= 0) {
                 remainingMs = 0
                 status = TimerStatus.Done
-                completeCallback()
+                completeCallback(stepId)
                 break
             }
             remainingMs = left

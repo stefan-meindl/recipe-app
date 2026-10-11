@@ -31,11 +31,12 @@ fun CookingStep(
     modifier: Modifier = Modifier,
     number: Int? = null,
     durationSeconds: Int = 0,
+    stepId: String = "",
     timerLabel: String? = null,
     card: Boolean = true,
     active: Boolean = false,
     onTimerStart: () -> Unit = {},
-    onTimerComplete: () -> Unit = {},
+    onTimerComplete: (String) -> Unit = {},
     body: @Composable ColumnScope.() -> Unit = {},
 ) {
     val c = Simmer.colors
@@ -71,7 +72,13 @@ fun CookingStep(
                 }
             }
             if (durationSeconds > 0) {
-                StepTimer(durationSeconds, label = timerLabel, onStart = onTimerStart, onComplete = onTimerComplete)
+                StepTimer(
+                    durationSeconds = durationSeconds,
+                    stepId = stepId,
+                    label = timerLabel,
+                    onStart = onTimerStart,
+                    onComplete = onTimerComplete,
+                )
             }
         }
         Column(verticalArrangement = Arrangement.spacedBy(SimmerSpace.xs), content = body)

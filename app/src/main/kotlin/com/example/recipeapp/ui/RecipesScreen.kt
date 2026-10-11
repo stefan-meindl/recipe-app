@@ -86,64 +86,70 @@ fun RecipesApp(viewModel: RecipesViewModel) {
                         overflow = TextOverflow.Ellipsis,
                     )
                 },
-                navigationIcon = {
-                    if (selected != null) {
-                        IconButton(onClick = viewModel::clearSelection) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                                contentDescription = "Back",
-                            )
-                        }
-                    }
-                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = c.surfacePage,
                     titleContentColor = c.textPrimary,
                 ),
+                navigationIcon = {
+                    if (selected != null) {
+                        IconButton(onClick = viewModel::clearSelection) {
+                            SimmerIcon(Icons.AutoMirrored.Outlined.ArrowBack, c.textPrimary, size = 20.dp)
+                        }
+                    }
+                },
             )
         },
-    ) { padding ->
-        if (selected == null) {
-            RecipeList(state.recipes, viewModel::select, Modifier.padding(padding))
-        } else {
-            RecipeDetail(state, viewModel, Modifier.padding(padding))
+        content = { padding ->
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+            ) {
+                if (selected == null) {
+                    RecipeList(state, viewModel)
+                } else {
+                    RecipeDetail(state, viewModel)
+                }
+            }
+        },
+    )
+}
+
+@Composable
+private fun RecipeList(
+    state: RecipesUiState,
+    viewModel: RecipesViewModel,
+) {
+    if (state.loading) {
+        Text("Loading...", Modifier.padding(SimmerSpace.lg))
+    } else {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(SimmerSpace.lg),
+            verticalArrangement = Arrangement.spacedBy(SimmerSpace.md),
+        ) {
+            items(state.recipes, key = { it.id }) { recipe ->
+                RecipeListItem(recipe) { viewModel.select(it) }
+            }
         }
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun RecipeList(recipes: List<Recipe>, onSelect: (String) -> Unit, modifier: Modifier = Modifier) {
+private fun RecipeListItem(
+    recipe: Recipe,
+    onClick: (String) -> Unit,
+) {
     val c = Simmer.colors
-    LazyColumn(
-        modifier = modifier,
-        contentPadding = PaddingValues(SimmerSpace.md),
-        verticalArrangement = Arrangement.spacedBy(SimmerSpace.sm),
+
+    SimmerCard(
+        modifier = Modifier.clickable { onClick(recipe.id) },
+        padding = SimmerSpace.lg,
     ) {
-        items(recipes, key = { it.id }) { recipe ->
-            val totalTime = remember(recipe) {
-                val p = recipe.prepTimeMinutes ?: 0
-                val k = recipe.cookTimeMinutes ?: 0
-                if (p > 0 || k > 0) "${p + k} min" else null
-            }
-            SimmerCard(
-                modifier = Modifier.fillMaxWidth().clickable { onSelect(recipe.id) },
-                padding = SimmerSpace.md,
-            ) {
-                Text(recipe.title, style = MaterialTheme.typography.headlineSmall, color = c.textPrimary)
-                Spacer(Modifier.height(SimmerSpace.xs))
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp),
-                ) {
-                    SimmerBadge(
-                        totalTime ?: "${recipe.preparationMethods.size} methods",
-                        variant = SimmerBadgeVariant.Primary,
-                        icon = Icons.Outlined.Schedule,
-                    )
-                    recipe.tags.take(3).forEach { tag -> SimmerBadge(tag) }
-                }
-            }
+        Text(recipe.title, style = MaterialTheme.typography.titleLarge, color = c.textPrimary)
+        Spacer(Modifier.height(4.dp))
+        if (recipe.tags.isNotEmpty()) {
+            recipe.tags.take(3).forEach { tag -> SimmerBadge(tag) }
         }
     }
 }
@@ -253,10 +259,15 @@ private fun RecipeDetail(
             Text("Steps", style = MaterialTheme.typography.headlineSmall, color = c.textPrimary)
             state.steps.forEachIndexed { index, step ->
                 key(selected.id, methodIndex, index) {
+                    val durationSeconds = (step.durationMinutes ?: 0) * 60
+                    val isCompleted = step.id.isNotEmpty() && state.completedStepIds.contains(step.id)
                     CookingStep(
                         title = "",
                         number = index + 1,
-                        durationSeconds = (step.durationMinutes ?: 0) * 60,
+                        durationSeconds = durationSeconds,
+                        stepId = step.id,
+                        active = isCompleted,
+                        onTimerComplete = { id -> viewModel.completeStep(id) },
                     ) {
                         val segments = remember(step.description, state.scaledIngredients) {
                             resolve(step.description, state.scaledIngredients)

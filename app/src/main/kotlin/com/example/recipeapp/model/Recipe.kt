@@ -24,7 +24,7 @@ import kotlinx.serialization.Serializable
  *         { "name": "Flour", "quantity": "200 g", "alternatives": ["gluten-free flour"], "tips": ["Sift for fluffier pancakes"] }
  *       ],
  *       "steps": [
- *         { "description": "Mix dry ingredients", "durationMinutes": 2, "tips": ["Sift together"] }
+ *         { "id": "mix", "description": "Mix dry ingredients", "durationMinutes": 2, "tips": ["Sift together"] }
  *       ]
  *     }
  *   ]
@@ -68,6 +68,7 @@ data class Ingredient(
 @Serializable
 data class Step(
     val description: String,
+    val id: String = "",
     val durationMinutes: Int? = null,
     val tips: List<String>? = null,
 )
