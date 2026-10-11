@@ -1,12 +1,8 @@
 package com.example.recipeapp.ui.components
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.lifecycle.SavedStateHandle
@@ -17,16 +13,18 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
-import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import androidx.test.ext.junit.runners.AndroidJUnit4
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@RunWith(AndroidJUnit4::class)
 class CookingStepViewTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val composeTestRule = createAndroidComposeRule<MainActivity>()
 
     private val testDispatcher = UnconfinedTestDispatcher()
 
@@ -44,9 +42,6 @@ class CookingStepViewTest {
 
     @Before
     fun setUp() = Dispatchers.setMain(testDispatcher)
-
-    @After
-    fun tearDown() = Dispatchers.resetMain()
 
     @Test
     fun headerText_matchesPrepPhase() {
@@ -70,7 +65,6 @@ class CookingStepViewTest {
     @Test
     fun refs_populateAnnotatedString() {
         var viewModel: CookingStepViewModel? = null
-        var refClicked: String? = null
         composeTestRule.setContent {
             val savedStateHandle = SavedStateHandle()
             viewModel = CookingStepViewModel(step, listOf(flour, sugar), savedStateHandle)
@@ -80,7 +74,6 @@ class CookingStepViewTest {
                     ingredients = listOf(flour, sugar),
                     viewModel = viewModel!!,
                     modifier = Modifier,
-                    onRefClick = { id -> refClicked = id },
                 )
             }
         }

@@ -15,16 +15,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.recipeapp.ui.theme.Simmer
 
-/** Format seconds as mm:ss (or h:mm:ss for hours). */
-private fun formatClock(totalSeconds: Int): String {
-    val s = totalSeconds.coerceAtLeast(0)
-    val h = s / 3600
-    val m = s % 3600 / 60
-    return if (h > 0) "$h:${pad(m)}:${pad(s % 60)}" else "$m:${pad(s % 60)}"
-}
-
-private fun pad(n: Int) = n.toString().padStart(2, '0')
-
 /**
  * Compact timer display: mm:ss with a circular progress ring.
  * Recomposes on state change.
