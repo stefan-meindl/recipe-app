@@ -14,7 +14,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -71,6 +70,11 @@ class CookingStepViewModel(
 
     private var timerJob: Job? = null
 
+    // -- Callbacks (set from the View) --
+
+    /** Callback for when a tappable ref is tapped. */
+    var onRefClick: (String) -> Unit = {}
+
     // -- Sync: SavedStateHandle mirrors elapsedFlow and isDone --
 
     init {
@@ -111,11 +115,6 @@ class CookingStepViewModel(
                 _isTimerRunningFlow.value = false
             }
         }
-    }
-
-    /** Handle a tap on a tappable ref. */
-    fun onRefClick(id: String) {
-        // Delegate ref tap handling (e.g., scroll to ingredient, show detail)
     }
 
     /** Parse instruction text into tappable refs using the #03 module. */
