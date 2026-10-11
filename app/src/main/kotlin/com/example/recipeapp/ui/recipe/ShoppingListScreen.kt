@@ -3,7 +3,6 @@ package com.example.recipeapp.ui.recipe
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.recipeapp.ui.components.ShoppingListItem
 import com.example.recipeapp.ui.components.SimmerButton
 import com.example.recipeapp.ui.components.SimmerButtonVariant
@@ -53,7 +53,10 @@ fun ShoppingListScreen(
     // Track checked items locally
     val checked = remember { mutableStateMapOf<String, Boolean>() }
 
-    BackHandler { onBack() }
+    BackHandler {
+        viewModel.onSave(state.servings, state.variantId, state.methodId)
+        onBack()
+    }
 
     Scaffold(
         containerColor = c.surfacePage,
@@ -114,7 +117,10 @@ fun ShoppingListScreen(
                     // Save button
                     SimmerButton(
                         "Save & Continue",
-                        onClick = onSave,
+                        onClick = {
+                            viewModel.onSave(state.servings, state.variantId, state.methodId)
+                            onSave()
+                        },
                         variant = SimmerButtonVariant.Primary,
                         fullWidth = true,
                         iconRight = Icons.Outlined.Check,

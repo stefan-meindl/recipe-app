@@ -34,6 +34,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
 
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.navigation.compose)
 
     // Image loading
     implementation(libs.coil3.compose)

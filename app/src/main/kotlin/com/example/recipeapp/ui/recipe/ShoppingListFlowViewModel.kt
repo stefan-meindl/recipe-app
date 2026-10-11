@@ -2,6 +2,7 @@ package com.example.recipeapp.ui.recipe
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavBackStackEntry
 import com.example.recipeapp.data.RecipeRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,17 +27,21 @@ data class ShoppingListItemData(
 
 class ShoppingListFlowViewModel(
     private val repository: RecipeRepository,
-    private val onSave: ((Int, String?, String?) -> Unit)?,
-    private val recipeId: String,
-    private val servings: Int,
-    private val variantId: String?,
-    private val methodId: String?,
+    private val navBackStackEntry: NavBackStackEntry,
+    private val recipeFlowState: MutableStateFlow<RecipeFlowState?>,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ShoppingListUiState())
     val uiState: StateFlow<ShoppingListUiState> = _uiState.asStateFlow()
 
     init {
+        // Parse args from NavBackStackEntry
+        val args = navBackStackEntry.arguments
+        val recipeId = args?.getString("recipeId") ?: ""
+        val servings = args?.getString("servings")?.toIntOrNull() ?: 1
+        val variantId = args?.getString("variantId")
+        val methodId = args?.getString("methodId")
+
         viewModelScope.launch {
             val recipes = repository.getRecipes()
             val recipe = recipes.find { it.id == recipeId }
@@ -74,9 +79,21 @@ class ShoppingListFlowViewModel(
         }
     }
 
-    /** Called on back press or save — bridges updated state back to parent. */
+    /**
+     * Bridges updated state back to the parent RecipeFlowViewModel.
+     * Called on back press or save to preserve user selections.
+     */
     fun onSave(newServings: Int, newVariantId: String?, newMethodId: String?) {
         _uiState.update { it.copy(servings = newServings) }
-        onSave?.invoke(newServings, newVariantId, newMethodId)
+
+        // Bridge state back to parent via the shared MutableStateFlow
+        val parentState = recipeFlowState.value
+        if (parentState != null) {
+            recipeFlowState.value = parentState.copy(
+                servings = newServings,
+                selectedVariant = parentState.variants.find { it.id == newVariantId },
+                selectedMethod = parentState.variants.find { it.id == newMethodId },
+            )
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.example.recipeapp.ui.recipe
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.recipeapp.data.RecipeRepository
 import com.example.recipeapp.model.PreparationMethod
@@ -19,6 +20,9 @@ class RecipeFlowViewModel(
 
     private val _uiState = MutableStateFlow<RecipeFlowState?>(null)
     val uiState: StateFlow<RecipeFlowState?> = _uiState.asStateFlow()
+
+    /** Mutable flow exposed for child screens (e.g. ShoppingList) to bridge state back. */
+    val mutableUiState: MutableStateFlow<RecipeFlowState?> = _uiState
 
     init {
         viewModelScope.launch {
@@ -64,5 +68,16 @@ class RecipeFlowViewModel(
     /** Complete a step by ID. */
     fun completeStep(stepId: String) {
         // Not persisted in RecipeFlowState — handled in Cooking panel via local state
+    }
+
+    /** Factory for creating RecipeFlowViewModel instances. */
+    class Factory(
+        private val repository: RecipeRepository,
+        private val recipeId: String,
+    ) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return RecipeFlowViewModel(repository, recipeId) as T
+        }
     }
 }

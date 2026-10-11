@@ -41,7 +41,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.rememberAsyncImagePainter
+import com.example.recipeapp.data.RecipeRepository
 import com.example.recipeapp.domain.parser.IngredientRef
 import com.example.recipeapp.domain.parser.PlainText
 import com.example.recipeapp.domain.parser.StepSegment
@@ -67,11 +69,12 @@ import com.example.recipeapp.ui.theme.SimmerType
 @Composable
 fun RecipeFlowScreen(
     recipeId: String,
-    viewModel: RecipeFlowViewModel,
+    repository: RecipeRepository,
     onNavigateToShoppingList: (String, Int, String?, String?) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val viewModel: RecipeFlowViewModel = viewModel(factory = RecipeFlowViewModel.Factory(repository, recipeId))
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
     val c = Simmer.colors
 
@@ -178,25 +181,47 @@ private fun RecipeOverviewGrid(
             }
 
             recipe.notes?.let { notes ->
-                SimmerCard(Modifier.fillMaxWidth(), variant = SimmerCardVariant.CreamSoft, padding = SimmerSpace.md) {
-                    Text("Notes", style = MaterialTheme.typography.titleMedium, color = c.textOnWarm)
-                    Spacer(Modifier.height(4.dp))
+                SimmerCard(Modifier.fillMaxWidth(), padding = SimmerSpace.md) {
                     Text(notes, style = MaterialTheme.typography.bodyMedium, color = c.textSecondary)
                 }
             }
+        }
 
-            SimmerButton(
-                "Select Recipe",
-                onClick = onSelect,
-                variant = SimmerButtonVariant.Primary,
-                fullWidth = true,
+        // Time and servings
+        Row(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(SimmerSpace.lg),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            recipe.prepTimeMinutes?.let {
+                SimmerBadge(
+                    "$it min prep",
+                    variant = SimmerBadgeVariant.Primary,
+                    icon = Icons.Outlined.Schedule,
+                )
+            }
+            recipe.cookTimeMinutes?.let {
+                SimmerBadge(
+                    "$it min cook",
+                    variant = SimmerBadgeVariant.Primary,
+                    icon = Icons.Outlined.Schedule,
+                )
+            }
+            SimmerBadge(
+                "${recipe.servings} servings",
+                variant = SimmerBadgeVariant.Primary,
             )
         }
+
+        SimmerButton(
+            text = "Select",
+            onClick = onSelect,
+            fullWidth = true,
+            iconRight = Icons.AutoMirrored.Outlined.ArrowBack,
+        )
     }
 }
 
-/** Stage 2: Selection — servings, variant/method selection, shopping list jump. */
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun RecipeSelectionPanel(
     state: RecipeFlowState,
@@ -294,19 +319,44 @@ private fun RecipeSelectionPanel(
             }
         }
 
-        // Shopping list and continue buttons
+        // Cooking method selector
+        if (state.variants.size > 1) {
+            Text("Cooking Method", style = MaterialTheme.typography.titleMedium, color = c.textPrimary)
+            SimmerCard(Modifier.fillMaxWidth(), padding = SimmerSpace.md) {
+                state.variants.forEach { variant ->
+                    val isSelected = state.selectedMethod?.id == variant.id
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onMethodSelected(variant) }
+                            .padding(vertical = SimmerSpace.sm),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        RadioButton(
+                            selected = isSelected,
+                            onClick = { onMethodSelected(variant) },
+                        )
+                        Text(variant.displayName, style = MaterialTheme.typography.bodyLarge, color = c.textPrimary)
+                    }
+                }
+            }
+        }
+
+        Spacer(Modifier.height(SimmerSpace.xl))
+
         Row(
             Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(SimmerSpace.sm),
+            horizontalArrangement = Arrangement.spacedBy(SimmerSpace.md),
         ) {
             SimmerButton(
                 "Shopping List",
                 onClick = onNavigateToShoppingList,
                 variant = SimmerButtonVariant.Secondary,
                 fullWidth = true,
+                iconLeft = Icons.Outlined.Schedule,
             )
             SimmerButton(
-                "Continue to Cooking",
+                "Continue",
                 onClick = onContinueToCooking,
                 variant = SimmerButtonVariant.Primary,
                 fullWidth = true,
@@ -315,8 +365,6 @@ private fun RecipeSelectionPanel(
     }
 }
 
-/** Stage 3: Cooking — prep and cook steps in separate LazyColumns. */
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun RecipeCookingPanel(
     state: RecipeFlowState,
