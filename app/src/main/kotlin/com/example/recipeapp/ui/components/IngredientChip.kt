@@ -4,10 +4,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.Box
+import androidx.compose.foundation.Column
+import androidx.compose.foundation.Row
+import androidx.compose.foundation.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -24,25 +24,30 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Popup
-import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.window.PopupPositionProvider
+import com.example.recipeapp.domain.parser.IngredientRef
 import com.example.recipeapp.ui.theme.Simmer
 import com.example.recipeapp.ui.theme.SimmerBorder
 import com.example.recipeapp.ui.theme.SimmerRadius
 import com.example.recipeapp.ui.theme.SimmerSpace
 import com.example.recipeapp.ui.theme.SimmerType
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /** Places the popover under the anchor, clamped to the window, flipping above when it would overflow. */
 private object BelowAnchor : PopupPositionProvider {
@@ -138,6 +143,86 @@ fun IngredientChip(
                                 }
                             }
                         }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Two-tap ingredient chip backed by [IngredientRef].
+ *
+ * Tap 1 → shows amount popup.
+ * Tap 2 → shows tips popup.
+ * Tap outside or 1.5s timeout → resets to 0.
+ */
+@Composable
+fun IngredientChip(
+    ref: IngredientRef,
+    onDismiss: () -> Unit = {},
+) {
+    var bounds by remember { mutableStateOf<Rect?>(null) }
+    var tapCount by remember { mutableStateOf(0) }
+
+    // Reset tapCount after 1.5s
+    androidx.compose.runtime.LaunchedEffect(tapCount) {
+        if (tapCount > 0) {
+            delay(1500L)
+            tapCount = 0
+        }
+    }
+
+    fun handleTap() {
+        tapCount = if (tapCount < 2) tapCount + 1 else 0
+    }
+
+    fun onDismissInternal() {
+        tapCount = 0
+        onDismiss()
+    }
+
+    Box {
+        Text(
+            ref.name,
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Medium,
+            color = Simmer.colors.textPrimary,
+            textDecoration = TextDecoration.Underline,
+            modifier = Modifier
+                .clip(SimmerRadius.xs)
+                .clickable(role = Role.Button) { handleTap() }
+                .onGloballyPositioned { bounds = it.localBounds }
+                .padding(horizontal = 2.dp, vertical = 1.dp),
+        )
+
+        if (tapCount == 1) {
+            Popup(
+                onDismissRequest = ::onDismissInternal,
+                properties = PopupProperties(focusable = true),
+                offset = bounds?.let { IntOffset(it.right + 8, it.top) } ?: IntOffset.Zero,
+            ) {
+                Box(
+                    Modifier
+                        .background(Color.White)
+                        .padding(8.dp),
+                ) {
+                    Text(ref.amount, style = MaterialTheme.typography.bodyLarge)
+                }
+            }
+        } else if (tapCount == 2) {
+            Popup(
+                onDismissRequest = ::onDismissInternal,
+                properties = PopupProperties(focusable = true),
+                offset = bounds?.let { IntOffset(it.left, it.bottom + 8) } ?: IntOffset.Zero,
+            ) {
+                Column(
+                    Modifier
+                        .background(Color.White)
+                        .padding(8.dp),
+                ) {
+                    ref.tips.forEach { tip ->
+                        Text(tip, style = MaterialTheme.typography.bodyMedium)
                     }
                 }
             }
