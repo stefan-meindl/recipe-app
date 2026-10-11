@@ -69,6 +69,8 @@ data class Ingredient(
 data class Step(
     val description: String,
     val id: String = "",
+    val title: String = "",
+    val phase: String = "",
     val durationMinutes: Int? = null,
     val tips: List<String>? = null,
 )

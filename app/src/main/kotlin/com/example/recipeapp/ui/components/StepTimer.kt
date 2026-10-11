@@ -180,22 +180,24 @@ fun StepTimer(
                 Text(text, style = SimmerType.buttonMd.copy(fontSize = 15.sp, fontFeatureSettings = "tnum"), color = fg, maxLines = 1)
             }
             if (running || paused) {
-                Box(
-                    Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(start = 12.dp, end = 12.dp, bottom = 5.dp)
-                        .fillMaxWidth()
-                        .height(3.dp)
-                        .clip(SimmerRadius.full)
-                        .background(if (running) Color.Black.copy(alpha = 0.22f) else c.borderSubtle),
-                ) {
+                Box(Modifier.matchParentSize()) {
                     Box(
                         Modifier
-                            .fillMaxWidth(progress)
+                            .align(Alignment.BottomStart)
+                            .padding(start = 12.dp, end = 12.dp, bottom = 5.dp)
+                            .fillMaxWidth()
                             .height(3.dp)
                             .clip(SimmerRadius.full)
-                            .background(if (running) c.accentFg else c.accent),
-                    )
+                            .background(if (running) Color.Black.copy(alpha = 0.22f) else c.borderSubtle),
+                    ) {
+                        Box(
+                            Modifier
+                                .fillMaxWidth(progress)
+                                .height(3.dp)
+                                .clip(SimmerRadius.full)
+                                .background(if (running) c.accentFg else c.accent),
+                        )
+                    }
                 }
             }
         }

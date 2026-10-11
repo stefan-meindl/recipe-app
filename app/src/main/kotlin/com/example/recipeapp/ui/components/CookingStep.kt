@@ -29,7 +29,7 @@ import com.example.recipeapp.ui.theme.SimmerType
 fun CookingStep(
     title: String,
     modifier: Modifier = Modifier,
-    number: Int? = null,
+    stepLabel: String? = null,
     durationSeconds: Int = 0,
     stepId: String = "",
     timerLabel: String? = null,
@@ -60,9 +60,9 @@ fun CookingStep(
             horizontalArrangement = Arrangement.spacedBy(SimmerSpace.md),
         ) {
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                if (number != null) {
+                if (stepLabel != null) {
                     Text(
-                        "STEP $number",
+                        stepLabel,
                         style = SimmerType.microUppercase,
                         color = if (active) c.textAccent else c.textTertiary,
                     )
