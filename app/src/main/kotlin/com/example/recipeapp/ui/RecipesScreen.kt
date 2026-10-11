@@ -45,8 +45,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.rememberAsyncImagePainter
+import com.example.recipeapp.domain.parser.IngredientRef
+import com.example.recipeapp.domain.parser.PlainText
+import com.example.recipeapp.domain.parser.StepSegment
+import com.example.recipeapp.domain.parser.resolve
 import com.example.recipeapp.model.Recipe
 import com.example.recipeapp.ui.components.CookingStep
+import com.example.recipeapp.ui.components.IngredientChip
 import com.example.recipeapp.ui.components.SegmentedTabs
 import com.example.recipeapp.ui.components.ShoppingListItem
 import com.example.recipeapp.ui.components.SimmerBadge
@@ -84,14 +89,16 @@ fun RecipesApp(viewModel: RecipesViewModel) {
                 navigationIcon = {
                     if (selected != null) {
                         IconButton(onClick = viewModel::clearSelection) {
-                            Icon(Icons.AutoMirrored.Outlined.ArrowBack, "Back")
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                                contentDescription = "Back",
+                            )
                         }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = c.surfacePage,
                     titleContentColor = c.textPrimary,
-                    navigationIconContentColor = c.textPrimary,
                 ),
             )
         },
@@ -137,6 +144,16 @@ private fun RecipeList(recipes: List<Recipe>, onSelect: (String) -> Unit, modifi
                     recipe.tags.take(3).forEach { tag -> SimmerBadge(tag) }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun StepBodyRenderer(segments: List<StepSegment>) {
+    segments.forEach { segment ->
+        when (segment) {
+            is PlainText -> Text(segment.text, style = MaterialTheme.typography.bodyLarge, color = Simmer.colors.textPrimary)
+            is IngredientRef -> IngredientChip(segment)
         }
     }
 }
@@ -194,7 +211,7 @@ private fun RecipeDetail(
 
             if (selected.preparationMethods.size > 1) {
                 SegmentedTabs(
-                    items = selected.preparationMethods.mapIndexed { i, m -> SimmerTabItem(i.toString(), m.displayName) },
+                    items = selected.preparationMethods.map { SimmerTabItem(it.id, it.displayName) },
                     value = methodIndex.toString(),
                     onChange = { viewModel.selectMethod(it.toInt()) },
                     modifier = Modifier.fillMaxWidth(),
@@ -241,7 +258,10 @@ private fun RecipeDetail(
                         number = index + 1,
                         durationSeconds = (step.durationMinutes ?: 0) * 60,
                     ) {
-                        Text(step.description, style = MaterialTheme.typography.bodyLarge, color = c.textPrimary)
+                        val segments = remember(step.description, state.scaledIngredients) {
+                            resolve(step.description, state.scaledIngredients)
+                        }
+                        StepBodyRenderer(segments)
                         step.tips?.forEach { tip ->
                             Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.Top) {
                                 SimmerIcon(Icons.Outlined.Lightbulb, c.textAccent, size = 18.dp)
