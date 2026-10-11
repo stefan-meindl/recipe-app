@@ -60,7 +60,7 @@ fun IngredientChip(
                 .onSizeChanged { size = it },
         )
 
-        if (tapCount == 1) {
+        if (tapCount == 1 && size != IntSize.Zero) {
             Popup(
                 onDismissRequest = {
                     tapCount = 0
@@ -76,7 +76,7 @@ fun IngredientChip(
                     Text(ref.amount)
                 }
             }
-        } else if (tapCount == 2) {
+        } else if (tapCount == 2 && size != IntSize.Zero) {
             Popup(
                 onDismissRequest = {
                     tapCount = 0
