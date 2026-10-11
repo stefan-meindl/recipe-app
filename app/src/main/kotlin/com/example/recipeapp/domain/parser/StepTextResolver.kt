@@ -78,9 +78,14 @@ fun resolve(stepBody: String, ingredients: List<Ingredient>): List<StepSegment> 
 
 /**
  * Extracts the ingredient key from a captured group.
- * Strips leading numbers and common modifier words, then takes the last remaining word.
+ * Handles both plain `{label}` (v1) and `{id:label}` (v2) formats by stripping any
+ * leading `id:` prefix, then strips leading numbers and common modifier words and
+ * takes the last remaining word.
  */
 private fun extractKey(captured: String): String {
+    // v2 format: "id:label" — drop the id prefix and work with the label only
+    val label = if (':' in captured) captured.substringAfter(':') else captured
+
     // Common modifier words to strip
     val modifierWords = setOf(
         "cloves", "slices", "pieces", "minced", "chopped", "diced", "whole",
@@ -91,9 +96,9 @@ private fun extractKey(captured: String): String {
     )
 
     // Split into words, remove leading numbers and modifier words
-    val words = captured.lowercase().split(Regex("\\s+"))
+    val words = label.lowercase().split(Regex("\\s+"))
     val filtered = words.dropWhile { it in modifierWords || it.all { c -> c.isDigit() || c == '.' } }
 
     // Take the last remaining word as the key
-    return filtered.lastOrNull()?.trim() ?: captured.trim()
+    return filtered.lastOrNull()?.trim() ?: label.trim()
 }
