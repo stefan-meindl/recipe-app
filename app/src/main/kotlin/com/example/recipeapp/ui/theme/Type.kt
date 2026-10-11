@@ -42,8 +42,12 @@ val JetBrainsMono = FontFamily(
     mono(FontWeight.Medium),
 )
 
-/** Simmer text styles with no Material 3 slot (typography.css: stat-display, micro-uppercase, button-md, code-md). */
+/** Simmer text styles with no Material 3 slot (typography.css: stat-display, micro-uppercase, button-md, code-md, heading-5). */
 object SimmerType {
+    val heading5 = TextStyle(
+        fontFamily = Inter, fontWeight = FontWeight.Medium,
+        fontSize = 18.sp, lineHeight = 25.2.sp,
+    )
     val statDisplay = TextStyle(
         fontFamily = InstrumentSerif, fontWeight = FontWeight.Normal,
         fontSize = 56.sp, lineHeight = 62.sp, letterSpacing = (-1).sp,
@@ -69,14 +73,14 @@ object SimmerType {
 val SimmerTypography = Typography(
     displayLarge = TextStyle(fontFamily = InstrumentSerif, fontWeight = FontWeight.Normal, fontSize = 57.sp, lineHeight = 64.sp, letterSpacing = (-1.5).sp),
     displayMedium = TextStyle(fontFamily = InstrumentSerif, fontWeight = FontWeight.Normal, fontSize = 45.sp, lineHeight = 52.sp, letterSpacing = (-1).sp),
-    displaySmall = TextStyle(fontFamily = InstrumentSerif, fontWeight = FontWeight.Normal, fontSize = 36.sp, lineHeight = 44.sp, letterSpacing = (-0.5).sp),
-    headlineLarge = TextStyle(fontFamily = InstrumentSerif, fontWeight = FontWeight.Normal, fontSize = 32.sp, lineHeight = 40.sp, letterSpacing = (-0.5).sp),
-    headlineMedium = TextStyle(fontFamily = InstrumentSerif, fontWeight = FontWeight.Normal, fontSize = 28.sp, lineHeight = 36.sp),
-    headlineSmall = TextStyle(fontFamily = InstrumentSerif, fontWeight = FontWeight.Normal, fontSize = 24.sp, lineHeight = 32.sp),
-    titleLarge = TextStyle(fontFamily = Inter, fontWeight = FontWeight.Medium, fontSize = 22.sp, lineHeight = 28.sp),
+    displaySmall = TextStyle(fontFamily = Inter, fontWeight = FontWeight.Medium, fontSize = 36.sp, lineHeight = 43.sp, letterSpacing = (-0.5).sp),
+    headlineLarge = TextStyle(fontFamily = Inter, fontWeight = FontWeight.Medium, fontSize = 32.sp, lineHeight = 40.sp, letterSpacing = (-0.5).sp),
+    headlineMedium = TextStyle(fontFamily = Inter, fontWeight = FontWeight.Medium, fontSize = 28.sp, lineHeight = 35.sp),
+    headlineSmall = TextStyle(fontFamily = Inter, fontWeight = FontWeight.Medium, fontSize = 24.sp, lineHeight = 31.sp),
+    titleLarge = TextStyle(fontFamily = Inter, fontWeight = FontWeight.Medium, fontSize = 22.sp, lineHeight = 28.6.sp),
     titleMedium = TextStyle(fontFamily = Inter, fontWeight = FontWeight.Medium, fontSize = 16.sp, lineHeight = 24.sp),
     titleSmall = TextStyle(fontFamily = Inter, fontWeight = FontWeight.Medium, fontSize = 14.sp, lineHeight = 20.sp),
-    bodyLarge = TextStyle(fontFamily = Inter, fontWeight = FontWeight.Normal, fontSize = 16.sp, lineHeight = 24.sp),
+    bodyLarge = TextStyle(fontFamily = Inter, fontWeight = FontWeight.Normal, fontSize = 16.sp, lineHeight = 24.8.sp),
     bodyMedium = TextStyle(fontFamily = Inter, fontWeight = FontWeight.Normal, fontSize = 14.sp, lineHeight = 21.sp),
     bodySmall = TextStyle(fontFamily = Inter, fontWeight = FontWeight.Normal, fontSize = 13.sp, lineHeight = 18.sp),
     labelLarge = TextStyle(fontFamily = Inter, fontWeight = FontWeight.Medium, fontSize = 14.sp, lineHeight = 18.sp),

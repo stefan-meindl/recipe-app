@@ -107,6 +107,9 @@ class JsonRecipeRepository(private val context: Context) : RecipeRepository {
             if (ConditionEvaluator.evaluate(step.condition, context) is ConditionResult.Fail) return@mapNotNull null
             Step(
                 description = step.body,
+                id = step.id,
+                title = step.title,
+                phase = step.phase.name,
                 durationMinutes = if (step.durationSeconds > 0) maxOf(1, step.durationSeconds / 60) else null,
             )
         }

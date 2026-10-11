@@ -29,13 +29,14 @@ import com.example.recipeapp.ui.theme.SimmerType
 fun CookingStep(
     title: String,
     modifier: Modifier = Modifier,
-    number: Int? = null,
+    stepLabel: String? = null,
     durationSeconds: Int = 0,
+    stepId: String = "",
     timerLabel: String? = null,
     card: Boolean = true,
     active: Boolean = false,
     onTimerStart: () -> Unit = {},
-    onTimerComplete: () -> Unit = {},
+    onTimerComplete: (String) -> Unit = {},
     body: @Composable ColumnScope.() -> Unit = {},
 ) {
     val c = Simmer.colors
@@ -59,9 +60,9 @@ fun CookingStep(
             horizontalArrangement = Arrangement.spacedBy(SimmerSpace.md),
         ) {
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                if (number != null) {
+                if (stepLabel != null) {
                     Text(
-                        "STEP $number",
+                        stepLabel,
                         style = SimmerType.microUppercase,
                         color = if (active) c.textAccent else c.textTertiary,
                     )
@@ -71,7 +72,13 @@ fun CookingStep(
                 }
             }
             if (durationSeconds > 0) {
-                StepTimer(durationSeconds, label = timerLabel, onStart = onTimerStart, onComplete = onTimerComplete)
+                StepTimer(
+                    durationSeconds = durationSeconds,
+                    stepId = stepId,
+                    label = timerLabel,
+                    onStart = onTimerStart,
+                    onComplete = onTimerComplete,
+                )
             }
         }
         Column(verticalArrangement = Arrangement.spacedBy(SimmerSpace.xs), content = body)

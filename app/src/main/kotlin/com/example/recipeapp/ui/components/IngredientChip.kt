@@ -1,6 +1,7 @@
 package com.example.recipeapp.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import com.example.recipeapp.domain.parser.IngredientRef
 import com.example.recipeapp.ui.theme.Simmer
+import com.example.recipeapp.ui.theme.SimmerBorder
 import com.example.recipeapp.ui.theme.SimmerRadius
 import kotlinx.coroutines.delay
 
@@ -47,15 +49,17 @@ fun IngredientChip(
         }
     }
 
+    val c = Simmer.colors
     Box {
         Text(
             ref.name,
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Medium,
-            color = Simmer.colors.textPrimary,
+            color = c.textPrimary,
             textDecoration = TextDecoration.Underline,
             modifier = Modifier
                 .clip(SimmerRadius.xs)
+                .background(if (tapCount > 0) c.surfaceWarmStrong else Color.Transparent)
                 .clickable { tapCount = if (tapCount < 2) tapCount + 1 else 0 }
                 .onSizeChanged { size = it },
         )
@@ -70,7 +74,9 @@ fun IngredientChip(
             ) {
                 Box(
                     Modifier
-                        .background(Color.White)
+                        .clip(SimmerRadius.lg)
+                        .background(c.surfaceCard)
+                        .border(SimmerBorder.width, c.borderStrong, SimmerRadius.lg)
                         .padding(8.dp),
                 ) {
                     Text(ref.amount)
@@ -86,7 +92,9 @@ fun IngredientChip(
             ) {
                 Column(
                     Modifier
-                        .background(Color.White)
+                        .clip(SimmerRadius.lg)
+                        .background(c.surfaceCard)
+                        .border(SimmerBorder.width, c.borderStrong, SimmerRadius.lg)
                         .padding(8.dp),
                 ) {
                     ref.tips.forEach { Text(it) }

@@ -64,6 +64,7 @@ import com.example.recipeapp.ui.components.SimmerIcon
 import com.example.recipeapp.ui.components.SimmerTabItem
 import com.example.recipeapp.ui.theme.Simmer
 import com.example.recipeapp.ui.theme.SimmerSpace
+import com.example.recipeapp.ui.theme.SimmerType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -86,74 +87,91 @@ fun RecipesApp(viewModel: RecipesViewModel) {
                         overflow = TextOverflow.Ellipsis,
                     )
                 },
-                navigationIcon = {
-                    if (selected != null) {
-                        IconButton(onClick = viewModel::clearSelection) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                                contentDescription = "Back",
-                            )
-                        }
-                    }
-                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = c.surfacePage,
                     titleContentColor = c.textPrimary,
                 ),
+                navigationIcon = {
+                    if (selected != null) {
+                        IconButton(onClick = viewModel::clearSelection) {
+                            SimmerIcon(Icons.AutoMirrored.Outlined.ArrowBack, c.textPrimary, size = 20.dp)
+                        }
+                    }
+                },
             )
         },
-    ) { padding ->
-        if (selected == null) {
-            RecipeList(state.recipes, viewModel::select, Modifier.padding(padding))
-        } else {
-            RecipeDetail(state, viewModel, Modifier.padding(padding))
+        content = { padding ->
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+            ) {
+                if (selected == null) {
+                    RecipeList(state, viewModel)
+                } else {
+                    RecipeDetail(state, viewModel)
+                }
+            }
+        },
+    )
+}
+
+@Composable
+private fun RecipeList(
+    state: RecipesUiState,
+    viewModel: RecipesViewModel,
+) {
+    if (state.loading) {
+        Text("Loading...", Modifier.padding(SimmerSpace.lg))
+    } else {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(SimmerSpace.lg),
+            verticalArrangement = Arrangement.spacedBy(SimmerSpace.md),
+        ) {
+            items(state.recipes, key = { it.id }) { recipe ->
+                RecipeListItem(recipe) { viewModel.select(it) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun RecipeListItem(
+    recipe: Recipe,
+    onClick: (String) -> Unit,
+) {
+    val c = Simmer.colors
+
+    SimmerCard(
+        modifier = Modifier.clickable { onClick(recipe.id) },
+        padding = SimmerSpace.md,
+    ) {
+        Text(recipe.title, style = SimmerType.heading5, color = c.textPrimary)
+        if (recipe.tags.isNotEmpty()) {
+            Spacer(Modifier.height(4.dp))
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                recipe.tags.take(3).forEach { tag -> SimmerBadge(tag) }
+            }
         }
     }
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun RecipeList(recipes: List<Recipe>, onSelect: (String) -> Unit, modifier: Modifier = Modifier) {
-    val c = Simmer.colors
-    LazyColumn(
-        modifier = modifier,
-        contentPadding = PaddingValues(SimmerSpace.md),
-        verticalArrangement = Arrangement.spacedBy(SimmerSpace.sm),
-    ) {
-        items(recipes, key = { it.id }) { recipe ->
-            val totalTime = remember(recipe) {
-                val p = recipe.prepTimeMinutes ?: 0
-                val k = recipe.cookTimeMinutes ?: 0
-                if (p > 0 || k > 0) "${p + k} min" else null
-            }
-            SimmerCard(
-                modifier = Modifier.fillMaxWidth().clickable { onSelect(recipe.id) },
-                padding = SimmerSpace.md,
-            ) {
-                Text(recipe.title, style = MaterialTheme.typography.headlineSmall, color = c.textPrimary)
-                Spacer(Modifier.height(SimmerSpace.xs))
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp),
-                ) {
-                    SimmerBadge(
-                        totalTime ?: "${recipe.preparationMethods.size} methods",
-                        variant = SimmerBadgeVariant.Primary,
-                        icon = Icons.Outlined.Schedule,
-                    )
-                    recipe.tags.take(3).forEach { tag -> SimmerBadge(tag) }
-                }
-            }
-        }
-    }
-}
-
-@Composable
 private fun StepBodyRenderer(segments: List<StepSegment>) {
-    segments.forEach { segment ->
-        when (segment) {
-            is PlainText -> Text(segment.text, style = MaterialTheme.typography.bodyLarge, color = Simmer.colors.textPrimary)
-            is IngredientRef -> IngredientChip(segment)
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(0.dp),
+        verticalArrangement = Arrangement.spacedBy(0.dp),
+    ) {
+        segments.forEach { segment ->
+            when (segment) {
+                is PlainText -> Text(segment.text, style = MaterialTheme.typography.bodyLarge, color = Simmer.colors.textPrimary)
+                is IngredientRef -> IngredientChip(segment)
+            }
         }
     }
 }
@@ -211,7 +229,7 @@ private fun RecipeDetail(
 
             if (selected.preparationMethods.size > 1) {
                 SegmentedTabs(
-                    items = selected.preparationMethods.map { SimmerTabItem(it.id, it.displayName) },
+                    items = selected.preparationMethods.mapIndexed { i, m -> SimmerTabItem(i.toString(), m.displayName) },
                     value = methodIndex.toString(),
                     onChange = { viewModel.selectMethod(it.toInt()) },
                     modifier = Modifier.fillMaxWidth(),
@@ -249,14 +267,42 @@ private fun RecipeDetail(
                 }
             }
 
+            // Pre-compute phase headings and step labels outside the rendering loop so they
+            // are stable across partial recompositions triggered by timer ticks.
+            val stepMeta = remember(state.steps) {
+                val counters = mutableMapOf<String, Int>()
+                var lastPhase = ""
+                state.steps.map { step ->
+                    val phaseKey = step.phase.uppercase().ifBlank { "STEP" }
+                    val phaseNum = (counters[phaseKey] ?: 0) + 1
+                    counters[phaseKey] = phaseNum
+                    val phaseHeading = if (step.phase != lastPhase) {
+                        lastPhase = step.phase
+                        when (step.phase) {
+                            "prep" -> "Preparation"
+                            "cook" -> "Cooking"
+                            else -> step.phase.replaceFirstChar { it.titlecase() }
+                        }
+                    } else null
+                    Triple(step, phaseHeading, "$phaseKey $phaseNum")
+                }
+            }
+
             // Cooking steps
-            Text("Steps", style = MaterialTheme.typography.headlineSmall, color = c.textPrimary)
-            state.steps.forEachIndexed { index, step ->
+            stepMeta.forEachIndexed { index, (step, phaseHeading, stepLabel) ->
                 key(selected.id, methodIndex, index) {
+                    val durationSeconds = (step.durationMinutes ?: 0) * 60
+                    val isCompleted = step.id.isNotEmpty() && state.completedStepIds.contains(step.id)
+                    phaseHeading?.let { heading ->
+                        Text(heading, style = MaterialTheme.typography.headlineMedium, color = c.textPrimary)
+                    }
                     CookingStep(
-                        title = "",
-                        number = index + 1,
-                        durationSeconds = (step.durationMinutes ?: 0) * 60,
+                        title = step.title,
+                        stepLabel = stepLabel,
+                        durationSeconds = durationSeconds,
+                        stepId = step.id,
+                        active = isCompleted,
+                        onTimerComplete = { id -> viewModel.completeStep(id) },
                     ) {
                         val segments = remember(step.description, state.scaledIngredients) {
                             resolve(step.description, state.scaledIngredients)
