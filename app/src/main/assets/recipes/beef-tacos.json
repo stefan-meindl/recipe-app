@@ -1,29 +1,32 @@
 {
-    "id": "beef-tacos",
-    "title": "Beef Tacos",
-    "prepTimeSeconds": 900,
-    "cookTimeSeconds": 1200,
-    "servings": 4,
-    "tags": ["dinner", "mexican", "spicy"],
-    "ingredients": [
-        { "name": "Ground beef", "quantity": "500 g" },
-        { "name": "Taco seasoning", "quantity": "2 packets", "alternatives": ["homemade: 1 tbsp chili powder, 1 tsp cumin, 1 tsp paprika, ½ tsp garlic powder"] },
-        { "name": "Corn tortillas", "quantity": "12", "alternatives": ["flour tortillas"] },
-        { "name": "Cheddar cheese", "quantity": "150 g", "alternatives": ["Monterey Jack", "queso fresco"] },
-        { "name": "Salsa", "quantity": "1 cup" },
-        { "name": "Sour cream", "quantity": "½ cup", "alternatives": ["Greek yogurt"] },
-        { "name": "Avocado", "quantity": "2" },
-        { "name": "Lime", "quantity": "2" },
-        { "name": "Fresh cilantro", "quantity": "½ bunch" },
-        { "name": "Salt", "quantity": "to taste" }
-    ],
-    "steps": [
-        { "description": "Heat a large skillet over medium-high heat. No oil needed — the beef fat will render.", "durationSeconds": 120 },
-        { "description": "Add ground beef, breaking it into small crumbles with a wooden spoon.", "durationSeconds": 180 },
-        { "description": "Season with taco seasoning and ½ tsp salt. Stir to coat evenly.", "durationSeconds": 60 },
-        { "description": "Reduce heat to medium and cook, stirring occasionally, until beef is browned and no pink remains.", "durationSeconds": 480 },
-        { "description": "While beef cooks, warm tortillas in a dry skillet over medium heat, 30 seconds per side.", "durationSeconds": 180 },
-        { "description": "Slice avocados and limes. Chop cilantro.", "durationSeconds": 180 },
-        { "description": "Assemble tacos: beef, cheese, salsa, sour cream, avocado slices, a squeeze of lime, and cilantro.", "durationSeconds": 120 }
-    ]
+  "id": "beef-tacos",
+  "title": "Beef Tacos",
+  "base": 4,
+  "category": "Mains",
+  "tags": ["dinner", "mexican", "spicy"],
+  "time": 35,
+  "difficulty": "Easy",
+  "variations": [],
+  "methods": [],
+  "ingredients": [
+    { "id": "gb", "name": "Ground beef", "q": 500, "u": "g", "aisle": "Meat" },
+    { "id": "ts", "name": "Taco seasoning", "q": 2, "u": "packets", "note": "or homemade: 1 tbsp chili powder, 1 tsp cumin, 1 tsp paprika, ½ tsp garlic powder", "aisle": "Spices" },
+    { "id": "ct", "name": "Corn tortillas", "q": 12, "u": "", "note": "or flour tortillas", "aisle": "Bakery" },
+    { "id": "ch", "name": "Cheddar cheese", "q": 150, "u": "g", "note": "or Monterey Jack or queso fresco", "aisle": "Dairy" },
+    { "id": "sl", "name": "Salsa", "q": 1, "u": "cup", "aisle": "Condiments" },
+    { "id": "sc", "name": "Sour cream", "q": 0.5, "u": "cup", "note": "or Greek yogurt", "aisle": "Dairy" },
+    { "id": "av", "name": "Avocado", "q": 2, "u": "", "aisle": "Produce" },
+    { "id": "li", "name": "Lime", "q": 2, "u": "", "aisle": "Produce" },
+    { "id": "ci", "name": "Fresh cilantro", "q": 0.5, "u": "bunch", "aisle": "Produce" },
+    { "id": "sa", "name": "Salt", "note": "to taste", "aisle": "Pantry" }
+  ],
+  "steps": [
+    { "id": "c-heat", "ph": "cook", "t": "Heat the skillet", "d": 120, "b": "Heat a large skillet over medium-high heat. No oil needed — the beef fat will render." },
+    { "id": "c-brown", "ph": "cook", "t": "Brown the beef", "d": 180, "needs": ["c-heat"], "b": "Add {gb:ground beef}, breaking it into small crumbles with a wooden spoon." },
+    { "id": "c-season", "ph": "cook", "t": "Season the beef", "d": 60, "needs": ["c-brown"], "b": "Season with {ts:taco seasoning} and ½ tsp {sa:salt}. Stir to coat evenly." },
+    { "id": "c-cook", "ph": "cook", "t": "Cook through", "d": 480, "needs": ["c-season"], "b": "Reduce heat to medium and cook, stirring occasionally, until beef is browned and no pink remains." },
+    { "id": "c-tortillas", "ph": "cook", "t": "Warm the tortillas", "d": 180, "b": "Warm {ct:corn tortillas} in a dry skillet over medium heat, 30 seconds per side." },
+    { "id": "p-garnish", "ph": "prep", "t": "Prep the garnishes", "d": 180, "b": "Slice {av:avocados} and {li:limes}. Chop {ci:cilantro}." },
+    { "id": "c-assemble", "ph": "cook", "t": "Assemble the tacos", "d": 120, "needs": ["c-cook", "c-tortillas", "p-garnish"], "b": "Fill each tortilla with beef, {ch:cheddar cheese}, {sl:salsa}, {sc:sour cream}, avocado slices, a squeeze of lime and cilantro." }
+  ]
 }

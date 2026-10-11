@@ -1,25 +1,29 @@
 {
-    "id": "pancakes",
-    "title": "Pancakes",
-    "prepTimeSeconds": 600,
-    "cookTimeSeconds": 900,
-    "servings": 4,
-    "tags": ["breakfast", "vegetarian"],
-    "ingredients": [
-        { "name": "Flour", "quantity": "200 g", "alternatives": ["gluten-free flour"] },
-        { "name": "Milk", "quantity": "300 ml", "alternatives": ["oat milk", "almond milk"] },
-        { "name": "Eggs", "quantity": "2" },
-        { "name": "Butter", "quantity": "20 g", "alternatives": ["vegetable oil (1 tbsp)"] },
-        { "name": "Sugar", "quantity": "2 tbsp" },
-        { "name": "Baking powder", "quantity": "1 tsp" },
-        { "name": "Salt", "quantity": "pinch" }
-    ],
-    "steps": [
-        { "description": "Mix dry ingredients: flour, sugar, baking powder, and salt in a large bowl.", "durationSeconds": 120 },
-        { "description": "Make a well in the center and pour in milk, eggs, and melted butter.", "durationSeconds": 60 },
-        { "description": "Whisk until just combined — lumps are fine. Don't overmix.", "durationSeconds": 60 },
-        { "description": "Heat a non-stick pan or griddle over medium heat. Add a small knob of butter.", "durationSeconds": 120 },
-        { "description": "Pour a ladle of batter (about ¼ cup per pancake). Cook until bubbles form on surface.", "durationSeconds": 180 },
-        { "description": "Flip and cook until golden brown, about 1-2 minutes more.", "durationSeconds": 120 }
-    ]
+  "id": "pancakes",
+  "title": "Pancakes",
+  "base": 4,
+  "category": "Breakfast",
+  "tags": ["breakfast", "vegetarian"],
+  "time": 25,
+  "difficulty": "Easy",
+  "summary": "Fluffy pancakes with a golden finish. Best served with maple syrup or fresh berries.",
+  "variations": [],
+  "methods": [],
+  "ingredients": [
+    { "id": "fl", "name": "Flour", "q": 200, "u": "g", "aisle": "Baking", "tips": ["Sift for fluffier pancakes"] },
+    { "id": "mi", "name": "Milk", "q": 300, "u": "ml", "aisle": "Dairy" },
+    { "id": "eg", "name": "Eggs", "q": 2, "u": "", "aisle": "Dairy" },
+    { "id": "bu", "name": "Butter", "q": 20, "u": "g", "aisle": "Dairy" },
+    { "id": "su", "name": "Sugar", "q": 2, "u": "tbsp", "aisle": "Baking" },
+    { "id": "bp", "name": "Baking powder", "q": 1, "u": "tsp", "aisle": "Baking" },
+    { "id": "sa", "name": "Salt", "q": 1, "u": "pinch", "aisle": "Pantry" }
+  ],
+  "steps": [
+    { "id": "p-dry", "ph": "prep", "t": "Mix dry ingredients", "d": 120, "b": "Mix {fl:flour}, {su:sugar}, {bp:baking powder} and {sa:salt} in a large bowl." },
+    { "id": "p-wet", "ph": "prep", "t": "Add wet ingredients", "d": 60, "needs": ["p-dry"], "b": "Make a well in the centre and pour in {mi:milk}, {eg:eggs} and melted {bu:butter}." },
+    { "id": "p-mix", "ph": "prep", "t": "Whisk the batter", "d": 60, "needs": ["p-wet"], "b": "Whisk until just combined — lumps are fine. Don't overmix." },
+    { "id": "c-heat", "ph": "cook", "t": "Heat the pan", "d": 120, "b": "Heat a non-stick pan or griddle over medium heat. Add a small knob of {bu:butter}." },
+    { "id": "c-pour", "ph": "cook", "t": "Cook the pancakes", "d": 180, "needs": ["p-mix", "c-heat"], "b": "Pour a ladle of batter (about ¼ cup per pancake). Cook until bubbles form on the surface." },
+    { "id": "c-flip", "ph": "cook", "t": "Flip and finish", "d": 120, "needs": ["c-pour"], "b": "Flip and cook until golden brown, about 1–2 minutes more." }
+  ]
 }

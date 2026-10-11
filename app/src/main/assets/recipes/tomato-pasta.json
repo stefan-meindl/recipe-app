@@ -1,26 +1,30 @@
 {
-    "id": "tomato-pasta",
-    "title": "Tomato Pasta",
-    "prepTimeSeconds": 300,
-    "cookTimeSeconds": 1200,
-    "servings": 2,
-    "tags": ["dinner", "vegetarian", "italian"],
-    "ingredients": [
-        { "name": "Spaghetti", "quantity": "250 g", "alternatives": ["penne", "fusilli"] },
-        { "name": "Canned tomatoes", "quantity": "400 g", "alternatives": ["fresh tomatoes (600g, diced)"] },
-        { "name": "Garlic", "quantity": "2 cloves", "alternatives": ["1 tsp garlic powder"] },
-        { "name": "Olive oil", "quantity": "2 tbsp" },
-        { "name": "Salt", "quantity": "to taste" },
-        { "name": "Black pepper", "quantity": "to taste" },
-        { "name": "Fresh basil", "quantity": "handful", "alternatives": ["1 tsp dried basil"] }
-    ],
-    "steps": [
-        { "description": "Bring a large pot of salted water to boil. Water should taste like the sea.", "durationSeconds": 300 },
-        { "description": "Add spaghetti and cook until al dente according to package directions.", "durationSeconds": 480 },
-        { "description": "While pasta cooks, crush tomatoes by hand or blend briefly.", "durationSeconds": 120 },
-        { "description": "Heat olive oil in a pan. Add crushed garlic and cook until fragrant, 30 seconds.", "durationSeconds": 60 },
-        { "description": "Add crushed tomatoes, salt, and pepper. Simmer for 10 minutes.", "durationSeconds": 600 },
-        { "description": "Drain pasta, reserving water. Add pasta to sauce with a splash of pasta water.", "durationSeconds": 60 },
-        { "description": "Toss over low heat until sauce clings to pasta. Top with basil.", "durationSeconds": 60 }
-    ]
+  "id": "tomato-pasta",
+  "title": "Tomato Pasta",
+  "base": 2,
+  "category": "Mains",
+  "tags": ["dinner", "vegetarian", "italian"],
+  "time": 25,
+  "difficulty": "Easy",
+  "summary": "Add a pinch of sugar to balance the acidity of the tomatoes.",
+  "variations": [],
+  "methods": [],
+  "ingredients": [
+    { "id": "sp", "name": "Spaghetti", "q": 250, "u": "g", "note": "or penne or fusilli", "aisle": "Pasta" },
+    { "id": "to", "name": "Canned tomatoes", "q": 400, "u": "g", "note": "or 600 g fresh tomatoes, diced", "aisle": "Tins and jars" },
+    { "id": "ga", "name": "Garlic", "q": 2, "u": "cloves", "aisle": "Produce" },
+    { "id": "oi", "name": "Olive oil", "q": 2, "u": "tbsp", "aisle": "Pantry" },
+    { "id": "sa", "name": "Salt", "note": "to taste", "aisle": "Pantry" },
+    { "id": "pe", "name": "Black pepper", "note": "to taste", "aisle": "Pantry" },
+    { "id": "ba", "name": "Fresh basil", "q": 1, "u": "handful", "note": "or 1 tsp dried basil", "aisle": "Produce" }
+  ],
+  "steps": [
+    { "id": "c-boil", "ph": "cook", "t": "Boil the water", "d": 300, "b": "Bring a large pot of salted water to the boil. Water should taste like the sea." },
+    { "id": "c-pasta", "ph": "cook", "t": "Cook the spaghetti", "d": 480, "needs": ["c-boil"], "b": "Add {sp:spaghetti} and cook until al dente according to package directions. Reserve ½ cup pasta water before draining." },
+    { "id": "p-tomatoes", "ph": "prep", "t": "Crush the tomatoes", "d": 120, "b": "Crush the {to:canned tomatoes} by hand or blend briefly." },
+    { "id": "c-garlic", "ph": "cook", "t": "Fry the garlic", "d": 60, "needs": ["p-tomatoes"], "b": "Heat {oi:olive oil} in a pan. Add crushed {ga:garlic} and cook until fragrant, 30 seconds." },
+    { "id": "c-sauce", "ph": "cook", "t": "Simmer the sauce", "d": 600, "needs": ["c-garlic"], "b": "Add crushed tomatoes, {sa:salt} and {pe:black pepper}. Simmer for 10 minutes, stirring occasionally." },
+    { "id": "c-combine", "ph": "cook", "t": "Combine pasta and sauce", "d": 60, "needs": ["c-pasta", "c-sauce"], "b": "Drain pasta, reserving water. Add pasta to sauce with a splash of pasta water." },
+    { "id": "c-finish", "ph": "cook", "t": "Toss and serve", "d": 60, "needs": ["c-combine"], "b": "Toss over low heat until sauce clings to pasta. Top with {ba:fresh basil}." }
+  ]
 }

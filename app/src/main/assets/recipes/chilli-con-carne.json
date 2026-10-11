@@ -67,7 +67,7 @@
     { "id": "oi", "name": "Olive oil", "q": 2, "u": "tbsp", "aisle": "Pantry" },
     { "id": "on", "name": "Onions", "q": 2, "u": "", "note": "finely chopped", "aisle": "Produce", "tips": ["Chill them for 10 minutes before chopping to cut down on tears."] },
     { "id": "pe", "name": "Red pepper", "q": 1, "u": "", "note": "diced", "aisle": "Produce" },
-    { "id": "ga", "name": "Garlic", "q": 3, "u": ["clove", "cloves"], "note": "crushed", "aisle": "Produce", "tips": ["Crush with the flat of a knife and a pinch of salt."] },
+    { "id": "ga", "name": "Garlic", "q": 3, "u": "cloves", "note": "crushed", "aisle": "Produce", "tips": ["Crush with the flat of a knife and a pinch of salt."] },
     { "id": "mb", "name": "Beef mince", "q": 500, "u": "g", "if": "mince=beef", "aisle": "Meat", "tips": ["15-20% fat keeps it juicy; leaner mince dries out.", "Brown it in batches if your pot is small."] },
     { "id": "mp", "name": "Plant-based mince", "q": 400, "u": "g", "if": "mince=plant", "aisle": "Chilled", "tips": ["It browns faster than beef. Keep the heat at medium."] },
     { "id": "cu", "name": "Ground cumin", "q": 2, "u": "tsp", "aisle": "Spices" },
@@ -84,7 +84,7 @@
     { "id": "ri", "name": "Long-grain rice", "q": 300, "u": "g", "aisle": "Pantry", "tips": ["Rinsing removes surface starch so the grains stay separate."] },
     { "id": "wa", "name": "Water", "q": 450, "u": "ml", "alt": [["rice=microwave", 600]], "note": "for the rice" },
     { "id": "cr", "name": "Soured cream", "q": 150, "u": "ml", "note": "to serve", "aisle": "Dairy" },
-    { "id": "co", "name": "Coriander", "q": 1, "u": ["bunch", "bunches"], "note": "to serve", "aisle": "Produce" }
+    { "id": "co", "name": "Coriander", "q": 1, "u": "bunch", "note": "to serve", "aisle": "Produce" }
   ],
   "steps": [
     { "id": "p-veg", "ph": "prep", "t": "Chop the vegetables", "d": 600, "b": "Finely chop the {on:onions}, dice the {pe:red pepper} and crush the {ga:garlic}. Keep them in separate piles." },
