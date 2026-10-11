@@ -89,7 +89,10 @@ fun RecipesApp(viewModel: RecipesViewModel) {
                 navigationIcon = {
                     if (selected != null) {
                         IconButton(onClick = viewModel::clearSelection) {
-                            Icon(Icons.AutoMirrored.Outlined.ArrowBack, "Back")
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                                contentDescription = "Back",
+                            )
                         }
                     }
                 },
@@ -208,7 +211,7 @@ private fun RecipeDetail(
 
             if (selected.preparationMethods.size > 1) {
                 SegmentedTabs(
-                    items = selected.preparationMethods.map { it.displayName },
+                    items = selected.preparationMethods.map { SimmerTabItem(it.id, it.displayName) },
                     value = methodIndex.toString(),
                     onChange = { viewModel.selectMethod(it.toInt()) },
                     modifier = Modifier.fillMaxWidth(),
