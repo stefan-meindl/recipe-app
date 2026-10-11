@@ -31,6 +31,10 @@ import kotlinx.coroutines.delay
 /**
  * Tappable ingredient mention: medium weight, 2dp orange underline. Tap opens a popover with
  * Amount (large serif figure plus note) and, when [tips] exist, a Tips tab.
+ *
+ * Overloaded for backward compatibility: the original signature accepted individual fields.
+ * The new signature accepts an [IngredientRef] to avoid API breaks while supporting the
+ * two-tap popup flow.
  */
 @Composable
 fun IngredientChip(
@@ -94,4 +98,27 @@ fun IngredientChip(
             }
         }
     }
+}
+
+/**
+ * Backward-compatible overload: accepts the original individual-field signature and
+ * constructs an [IngredientRef] internally so callers using the old API are not broken.
+ */
+@Composable
+fun IngredientChip(
+    name: String,
+    amount: String,
+    modifier: String? = null,
+    note: String? = null,
+    tips: List<String> = emptyList(),
+    label: String? = null,
+    onDismiss: () -> Unit = {},
+) {
+    val ref = IngredientRef(
+        id = name,
+        name = name,
+        amount = listOfNotNull(amount, modifier, note).filter { it.isNotBlank() }.joinToString(" "),
+        tips = tips,
+    )
+    IngredientChip(ref, onDismiss)
 }
