@@ -53,9 +53,6 @@ fun CookingStepView(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    // Wire ref click callback
-    viewModel.onRefClick = onRefClick
-
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -88,7 +85,10 @@ fun CookingStepView(
             InstructionText(
                 instructionText = uiState.instructionText,
                 refs = uiState.refs,
-                onRefClickAction = onRefClick,
+                onRefClickAction = { id ->
+                    viewModel.onRefClick(id)
+                    onRefClick(id)
+                },
                 modifier = Modifier.weight(1f),
             )
         }

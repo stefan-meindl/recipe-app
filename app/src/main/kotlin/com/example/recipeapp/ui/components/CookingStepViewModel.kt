@@ -71,10 +71,6 @@ class CookingStepViewModel(
 
     private var timerJob: Job? = null
 
-    // -- Callbacks --
-
-    var onRefClick: (String) -> Unit = {}
-
     // -- Sync: SavedStateHandle mirrors elapsedFlow and isDone --
 
     init {
@@ -115,6 +111,11 @@ class CookingStepViewModel(
                 _isTimerRunningFlow.value = false
             }
         }
+    }
+
+    /** Handle a tap on a tappable ref. */
+    fun onRefClick(id: String) {
+        // Delegate ref tap handling (e.g., scroll to ingredient, show detail)
     }
 
     /** Parse instruction text into tappable refs using the #03 module. */
