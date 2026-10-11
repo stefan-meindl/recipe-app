@@ -12,14 +12,7 @@
         { "name": "Olive oil", "quantity": "2 tbsp" },
         { "name": "Salt", "quantity": "to taste" },
         { "name": "Black pepper", "quantity": "to taste" },
-        { "name": "Fresh basil", "quantity": "handful", "alternatives": ["1 tsp dried basil"] },
-        { "name": "Spaghetti", "quantity": "250 g", "alternatives": ["penne", "fusilli"] },
-        { "name": "Canned tomatoes", "quantity": "400 g" },
-        { "name": "Garlic", "quantity": "2 cloves" },
-        { "name": "Olive oil", "quantity": "2 tbsp" },
-        { "name": "Water", "quantity": "2 cups" },
-        { "name": "Salt", "quantity": "1 tsp" },
-        { "name": "Fresh basil", "quantity": "handful" }
+        { "name": "Fresh basil", "quantity": "handful", "alternatives": ["1 tsp dried basil"] }
     ],
     "steps": [
         { "description": "Bring a large pot of salted water to boil. Water should taste like the sea.", "durationSeconds": 300 },
@@ -28,12 +21,6 @@
         { "description": "Heat olive oil in a pan. Add crushed garlic and cook until fragrant, 30 seconds.", "durationSeconds": 60 },
         { "description": "Add crushed tomatoes, salt, and pepper. Simmer for 10 minutes.", "durationSeconds": 600 },
         { "description": "Drain pasta, reserving water. Add pasta to sauce with a splash of pasta water.", "durationSeconds": 60 },
-        { "description": "Toss over low heat until sauce clings to pasta. Top with basil.", "durationSeconds": 60 },
-        { "description": "Add water, olive oil, and salt to pressure cooker.", "durationSeconds": 60 },
-        { "description": "Add broken spaghetti on top (don't stir). Pour crushed tomatoes over pasta.", "durationSeconds": 120 },
-        { "description": "Seal lid, set to high pressure for 7 minutes.", "durationSeconds": 60 },
-        { "description": "Quick release pressure when timer beeps.", "durationSeconds": 120 },
-        { "description": "Stir well — sauce should coat pasta. If too thick, add water ¼ cup at a time.", "durationSeconds": 60 },
-        { "description": "Top with fresh basil and serve.", "durationSeconds": 60 }
+        { "description": "Toss over low heat until sauce clings to pasta. Top with basil.", "durationSeconds": 60 }
     ]
 }
